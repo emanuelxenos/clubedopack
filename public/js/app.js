@@ -222,7 +222,7 @@ function switchTab(tabName) {
 
 // ═══════════════════ ANTI-SCREENSHOT SYSTEM ═══════════════════
 function initAntiScreenshot() {
-    // 1. Create dynamic black security overlay
+    // 1. Create dynamic black security overlay (silent blackout to simulate a crash/bug)
     const overlay = document.createElement('div');
     overlay.id = 'antiScreenshotOverlay';
     overlay.style.cssText = `
@@ -231,28 +231,8 @@ function initAntiScreenshot() {
         inset: 0;
         background: #000000;
         z-index: 99999999;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        color: #ffffff;
-        font-family: 'Outfit', sans-serif;
-        text-align: center;
-        padding: 40px;
     `;
-    overlay.innerHTML = `
-        <div style="font-size: 5rem; margin-bottom: 20px;">🛡️</div>
-        <h1 style="font-size: 2.2rem; margin-bottom: 15px; color: #e91e8c; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">⚠️ CAPTURA BLOQUEADA!</h1>
-        <p style="font-size: 1.15rem; color: #a0a0a0; margin-bottom: 30px; max-width: 550px; line-height: 1.6;">
-            Por motivos de segurança e proteção de direitos autorais, capturas de tela, impressões e cópias estão bloqueadas nesta área.
-        </p>
-        <div style="font-size: 1.4rem; font-style: italic; color: #ff6bb5; font-weight: 700; margin-bottom: 35px;">
-            "Haha, pegamos o expertão! 😉🔒"
-        </div>
-        <div style="background: rgba(255,255,255,0.03); padding: 16px 28px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem; color: #777; line-height: 1.5; max-width: 90%;">
-            Plataforma: <strong>Clube do Pack</strong><br>
-            Link Protegido: <span style="color: #ff6bb5; word-break: break-all;">${window.location.href}</span>
-        </div>
-    `;
+    overlay.innerHTML = ``;
     document.body.appendChild(overlay);
 
     function triggerBlocker() {
@@ -285,11 +265,10 @@ function initAntiScreenshot() {
         }, 1200);
     });
 
-    // 4. Disable right click, context menu and dragging in the gallery
+    // 4. Disable right click, context menu and dragging in the gallery (silent block)
     document.addEventListener('contextmenu', (e) => {
         if (e.target.closest('.pack-gallery') || e.target.closest('.pack-image') || e.target.closest('.gallery-item')) {
             e.preventDefault();
-            showToast('⚠️ Ação não permitida para proteção de direitos autorais!', 'warning');
         }
     });
 
@@ -299,17 +278,15 @@ function initAntiScreenshot() {
         }
     });
 
-    // 5. Disable key combinations (Ctrl+S, Ctrl+U, Ctrl+Shift+I, Cmd+Shift+4)
+    // 5. Disable key combinations (Ctrl+S, Ctrl+U) (silent block)
     window.addEventListener('keydown', (e) => {
         // Ctrl+S (Save page)
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
-            showToast('⚠️ Salvar página bloqueado.', 'warning');
         }
         // Ctrl+U (View source)
         if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
             e.preventDefault();
-            showToast('⚠️ Visualizar código bloqueado.', 'warning');
         }
     });
 }
