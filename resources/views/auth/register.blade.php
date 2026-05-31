@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Conta - Clube do Pack</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <div class="auth-page">
@@ -93,10 +93,6 @@
         </div>
     </div>
 
-    @if(config('app.env') === 'local')
-        <script src="{{ asset('js/app.js') }}"></script>
-    @else
-        <script src="{{ asset('js/app.min.js') }}"></script>
-    @endif
+
 </body>
 </html>

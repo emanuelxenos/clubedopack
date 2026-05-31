@@ -6,7 +6,7 @@
     <meta name="description" content="Clube do Pack - Marketplace de conteúdo exclusivo dos melhores criadores. Packs de fotos e vídeos premium.">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Clube do Pack') - Marketplace de Conteúdo Exclusivo</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
 <body>
@@ -206,11 +206,7 @@
     </footer>
     @endif
 
-    @if(config('app.env') === 'local')
-        <script src="{{ asset('js/app.js') }}"></script>
-    @else
-        <script src="{{ asset('js/app.min.js') }}"></script>
-    @endif
+
     @stack('scripts')
 </body>
 </html>
