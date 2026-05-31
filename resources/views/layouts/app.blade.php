@@ -206,7 +206,11 @@
     </footer>
     @endif
 
-    <script src="{{ asset('js/app.js') }}"></script>
+    @if(config('app.env') === 'local')
+        <script src="{{ asset('js/app.js') }}"></script>
+    @else
+        <script src="{{ asset('js/app.min.js') }}"></script>
+    @endif
     @stack('scripts')
 </body>
 </html>

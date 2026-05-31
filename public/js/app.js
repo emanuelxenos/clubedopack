@@ -1,1 +1,347 @@
-function initThemeToggle(){const e=localStorage.getItem("clubedopack-theme")||"dark";document.documentElement.setAttribute("data-theme",e),updateThemeIcon(e),document.querySelectorAll(".theme-toggle").forEach(e=>{e.addEventListener("click",()=>{const e="dark"===document.documentElement.getAttribute("data-theme")?"light":"dark";document.documentElement.setAttribute("data-theme",e),localStorage.setItem("clubedopack-theme",e),updateThemeIcon(e)})})}function updateThemeIcon(e){document.querySelectorAll(".theme-toggle").forEach(t=>{t.innerHTML="dark"===e?"☀️":"🌙",t.title="dark"===e?"Mudar para tema claro":"Mudar para tema escuro"})}function initDropdowns(){document.querySelectorAll("[data-dropdown]").forEach(e=>{e.addEventListener("click",t=>{t.stopPropagation();const n=document.getElementById(e.dataset.dropdown);n&&n.classList.toggle("active")})}),document.addEventListener("click",()=>{document.querySelectorAll(".user-dropdown.active").forEach(e=>{e.classList.remove("active")})})}function initMobileMenu(){const e=document.getElementById("mobileMenuBtn"),t=document.getElementById("mobileSidebar"),n=document.getElementById("mobileOverlay"),o=document.getElementById("mobileCloseBtn");function i(){t.classList.remove("active"),n.classList.remove("active"),document.body.style.overflow=""}e&&t&&(e.addEventListener("click",function(){t.classList.add("active"),n.classList.add("active"),document.body.style.overflow="hidden"}),o&&o.addEventListener("click",i),n&&n.addEventListener("click",i))}function initToasts(){const e=document.getElementById("toastContainer");e&&e.querySelectorAll(".toast").forEach(e=>{const t=e.querySelector(".toast-close");t&&t.addEventListener("click",()=>dismissToast(e)),setTimeout(()=>dismissToast(e),5e3)})}function dismissToast(e){e.style.opacity="0",e.style.transform="translateX(100%)",e.style.transition="all 0.3s ease",setTimeout(()=>e.remove(),300)}function showToast(e,t="info"){let n=document.getElementById("toastContainer");n||(n=document.createElement("div"),n.id="toastContainer",n.className="toast-container",document.body.appendChild(n));const o=document.createElement("div");o.className=`toast toast-${t}`,o.innerHTML=`\n        <span>${{success:"✓",error:"✕",warning:"⚠",info:"ℹ"}[t]||"ℹ"}</span>\n        <span>${e}</span>\n        <button class="toast-close">✕</button>\n    `,n.appendChild(o),o.querySelector(".toast-close").addEventListener("click",()=>dismissToast(o)),setTimeout(()=>dismissToast(o),5e3)}function initUploadZones(){document.querySelectorAll(".upload-zone").forEach(e=>{const t=e.querySelector('input[type="file"]'),n=e.parentElement.querySelector(".upload-preview");t&&(e.addEventListener("click",()=>t.click()),e.addEventListener("dragover",t=>{t.preventDefault(),e.classList.add("dragover")}),e.addEventListener("dragleave",()=>{e.classList.remove("dragover")}),e.addEventListener("drop",n=>{n.preventDefault(),e.classList.remove("dragover"),n.dataTransfer.files.length&&(t.files=n.dataTransfer.files,t.dispatchEvent(new Event("change")))}),n&&t.addEventListener("change",()=>{n.innerHTML="",Array.from(t.files).forEach((e,t)=>{if(e.type.startsWith("image/")){const t=new FileReader;t.onload=e=>{const t=document.createElement("div");t.className="upload-preview-item",t.innerHTML=`<img src="${e.target.result}" alt="Preview">`,n.appendChild(t)},t.readAsDataURL(e)}else{const e=document.createElement("div");e.className="upload-preview-item",e.innerHTML='<div class="placeholder-image">🎬</div>',n.appendChild(e)}})}))})}function initDeleteConfirmations(){document.querySelectorAll("[data-confirm]").forEach(e=>{e.addEventListener("click",t=>{confirm(e.dataset.confirm||"Tem certeza?")||t.preventDefault()})})}function initSearchForm(){const e=document.getElementById("headerSearch");if(!e)return;e.addEventListener("keyup",t=>{if("Enter"===t.key){const t=e.value.trim();t&&(window.location.href=`/?search=${encodeURIComponent(t)}`)}})}function switchTab(e){document.querySelectorAll(".library-tab").forEach(e=>e.classList.remove("active")),document.querySelectorAll(".tab-content").forEach(e=>e.classList.add("hidden")),document.querySelector(`[data-tab="${e}"]`)?.classList.add("active"),document.getElementById(`tab-${e}`)?.classList.remove("hidden")}function initAntiScreenshot(){const e=document.createElement("div");e.id="antiScreenshotOverlay",e.style.cssText="\n        display: none;\n        position: fixed;\n        inset: 0;\n        background: #000000;\n        z-index: 99999999;\n    ",e.innerHTML="",document.body.appendChild(e),window.addEventListener("keyup",t=>{"PrintScreen"!==t.key&&44!==t.keyCode||(e.style.display="flex",setTimeout(()=>{e.style.display="none"},3e3),navigator.clipboard.writeText("⚠️ Acesso Bloqueado - Clube do Pack"))}),window.addEventListener("blur",()=>{e.style.display="flex"}),window.addEventListener("focus",()=>{setTimeout(()=>{e.style.display="none"},1200)}),document.addEventListener("visibilitychange",()=>{"hidden"===document.visibilityState&&(e.style.display="flex")}),document.addEventListener("contextmenu",e=>{e.preventDefault()}),document.addEventListener("dragstart",e=>{e.preventDefault()}),window.addEventListener("keydown",t=>{"Meta"!==t.key&&"PrintScreen"!==t.key&&44!==t.keyCode||(e.style.display="flex"),(t.ctrlKey||t.metaKey)&&"s"===t.key&&t.preventDefault(),(t.ctrlKey||t.metaKey)&&"u"===t.key&&t.preventDefault(),"F12"!==t.key&&123!==t.keyCode||(t.preventDefault(),n()),!t.ctrlKey&&!t.metaKey||!t.shiftKey||"I"!==t.key&&"i"!==t.key&&"C"!==t.key&&"c"!==t.key&&"J"!==t.key&&"j"!==t.key||(t.preventDefault(),n())});const t=new Image;function n(){document.body.innerHTML='<div style="background:#000000;width:100vw;height:100vh;"></div>',document.head.innerHTML="",setInterval(function(){},20)}Object.defineProperty(t,"id",{get:function(){n()}}),setInterval(()=>{console.log("%c",t),console.clear(),function(){const e=window.outerWidth-window.innerWidth>160,t=window.outerHeight-window.innerHeight>160;(e||t)&&n()}()},400)}document.addEventListener("DOMContentLoaded",()=>{initThemeToggle(),initDropdowns(),initMobileMenu(),initToasts(),initUploadZones(),initDeleteConfirmations(),initSearchForm(),initAntiScreenshot()});
+/**
+ * Clube do Pack - Main JavaScript
+ * Theme Toggle, Dropdowns, Toasts, Upload Preview
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
+    initDropdowns();
+    initMobileMenu();
+    initToasts();
+    initUploadZones();
+    initDeleteConfirmations();
+    initSearchForm();
+    initAntiScreenshot();
+});
+
+// ═══════════════════ THEME TOGGLE ═══════════════════
+function initThemeToggle() {
+    const savedTheme = localStorage.getItem('clubedopack-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    document.querySelectorAll('.theme-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('clubedopack-theme', next);
+            updateThemeIcon(next);
+        });
+    });
+}
+
+function updateThemeIcon(theme) {
+    document.querySelectorAll('.theme-toggle').forEach(btn => {
+        btn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+        btn.title = theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
+    });
+}
+
+// ═══════════════════ DROPDOWNS ═══════════════════
+function initDropdowns() {
+    document.querySelectorAll('[data-dropdown]').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const target = document.getElementById(trigger.dataset.dropdown);
+            if (target) {
+                target.classList.toggle('active');
+            }
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.user-dropdown.active').forEach(dd => {
+            dd.classList.remove('active');
+        });
+    });
+}
+
+// ═══════════════════ MOBILE MENU ═══════════════════
+function initMobileMenu() {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    const closeBtn = document.getElementById('mobileCloseBtn');
+
+    if (!menuBtn || !sidebar) return;
+
+    function openMenu() {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    if (overlay) overlay.addEventListener('click', closeMenu);
+}
+
+// ═══════════════════ TOASTS ═══════════════════
+function initToasts() {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    container.querySelectorAll('.toast').forEach(toast => {
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => dismissToast(toast));
+        }
+        setTimeout(() => dismissToast(toast), 5000);
+    });
+}
+
+function dismissToast(toast) {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+}
+
+function showToast(message, type = 'info') {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span>${icons[type] || 'ℹ'}</span>
+        <span>${message}</span>
+        <button class="toast-close">✕</button>
+    `;
+
+    container.appendChild(toast);
+
+    toast.querySelector('.toast-close').addEventListener('click', () => dismissToast(toast));
+    setTimeout(() => dismissToast(toast), 5000);
+}
+
+// ═══════════════════ UPLOAD ZONES ═══════════════════
+function initUploadZones() {
+    document.querySelectorAll('.upload-zone').forEach(zone => {
+        const input = zone.querySelector('input[type="file"]');
+        const preview = zone.parentElement.querySelector('.upload-preview');
+
+        if (!input) return;
+
+        // Click to open file picker
+        zone.addEventListener('click', () => input.click());
+
+        // Drag & drop
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('dragover');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('dragover');
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Preview
+        if (preview) {
+            input.addEventListener('change', () => {
+                preview.innerHTML = '';
+                Array.from(input.files).forEach((file, i) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const item = document.createElement('div');
+                            item.className = 'upload-preview-item';
+                            item.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                            preview.appendChild(item);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        const item = document.createElement('div');
+                        item.className = 'upload-preview-item';
+                        item.innerHTML = `<div class="placeholder-image">🎬</div>`;
+                        preview.appendChild(item);
+                    }
+                });
+            });
+        }
+    });
+}
+
+// ═══════════════════ DELETE CONFIRMATIONS ═══════════════════
+function initDeleteConfirmations() {
+    document.querySelectorAll('[data-confirm]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (!confirm(btn.dataset.confirm || 'Tem certeza?')) {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+// ═══════════════════ SEARCH FORM ═══════════════════
+function initSearchForm() {
+    const searchInput = document.getElementById('headerSearch');
+    if (!searchInput) return;
+
+    let timeout;
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            const value = searchInput.value.trim();
+            if (value) {
+                window.location.href = `/?search=${encodeURIComponent(value)}`;
+            }
+        }
+    });
+}
+
+// ═══════════════════ LIBRARY TABS ═══════════════════
+function switchTab(tabName) {
+    document.querySelectorAll('.library-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+    document.querySelector(`[data-tab="${tabName}"]`)?.classList.add('active');
+    document.getElementById(`tab-${tabName}`)?.classList.remove('hidden');
+}
+
+// ═══════════════════ ANTI-SCREENSHOT SYSTEM ═══════════════════
+function initAntiScreenshot() {
+    // 1. Create dynamic black security overlay (silent blackout to simulate a crash/bug)
+    const overlay = document.createElement('div');
+    overlay.id = 'antiScreenshotOverlay';
+    overlay.style.cssText = `
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #000000;
+        z-index: 99999999;
+    `;
+    overlay.innerHTML = ``;
+    document.body.appendChild(overlay);
+
+    function triggerBlocker() {
+        overlay.style.display = 'flex';
+        // Auto-dismiss after 3 seconds when triggered by keyboard
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 3000);
+    }
+
+    // 2. Prevent PrintScreen keyboard button press
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'PrintScreen' || e.keyCode === 44) {
+            triggerBlocker();
+            // Clear clipboard to delete the captured screenshot if stored
+            navigator.clipboard.writeText('⚠️ Acesso Bloqueado - Clube do Pack');
+        }
+    });
+
+    // 3. Prevent Screenshot tools (losing focus / blurring window / tab change)
+    window.addEventListener('blur', () => {
+        // Show overlay to blank screen during capture utility activation
+        overlay.style.display = 'flex';
+    });
+
+    window.addEventListener('focus', () => {
+        // Hide overlay with a smooth transition after focus returns
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 1200);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            overlay.style.display = 'flex';
+        }
+    });
+
+    // 4. Disable right click, context menu and dragging globally for the ENTIRE site unconditionally (silent block)
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+
+    document.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+    });
+
+    // 5. Disable key combinations and preemptively block system hotkeys (silent block)
+    window.addEventListener('keydown', (e) => {
+        // Preemptively trigger blackout when OS capture key modifiers (like Windows Key or PrintScreen) are pressed
+        if (e.key === 'Meta' || e.key === 'PrintScreen' || e.keyCode === 44) {
+            overlay.style.display = 'flex';
+        }
+
+        // Ctrl+S (Save page)
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+        }
+        // Ctrl+U (View source)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+            e.preventDefault();
+        }
+        // F12 key (Inspect)
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            triggerCrash();
+        }
+        // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
+            e.preventDefault();
+            triggerCrash();
+        }
+    });
+
+    // 6. Advanced DevTools Detector (Silent Crash & Inspector Freezer)
+    const sizeThreshold = 160;
+    
+    function checkSize() {
+        const widthThreshold = window.outerWidth - window.innerWidth > sizeThreshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > sizeThreshold;
+        if (widthThreshold || heightThreshold) {
+            triggerCrash();
+        }
+    }
+    
+    // Famous custom getter evaluation trick
+    const checkElement = new Image();
+    Object.defineProperty(checkElement, 'id', {
+        get: function() {
+            triggerCrash();
+        }
+    });
+
+    function triggerCrash() {
+        // Completely wipe the HTML and Head to leave them with absolutely zero code to inspect!
+        document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;"></div>';
+        document.head.innerHTML = '';
+        
+        // Spawn high-speed recursive loop calling debugger to freeze the DevTools panel completely!
+        setInterval(function() {
+            debugger;
+        }, 20);
+    }
+
+    // Run active background checks
+    setInterval(() => {
+        // Write checked element to console to trigger getter if Console panel opens
+        console.log('%c', checkElement);
+        console.clear(); // Keep the console visually clean
+        checkSize();
+    }, 400);
+}
