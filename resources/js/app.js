@@ -222,7 +222,17 @@ function switchTab(tabName) {
 
 // ═══════════════════ ANTI-SCREENSHOT SYSTEM ═══════════════════
 function initAntiScreenshot() {
-    // 1. Create dynamic black security overlay (silent blackout to simulate a crash/bug)
+    // 1. Only run print/screenshot/devtools protection on pack gallery (premium content detail) pages to avoid annoying flashes during standard navigation
+    if (!document.querySelector('.pack-gallery')) {
+        return;
+    }
+
+    let isNavigating = false;
+    window.addEventListener('beforeunload', () => {
+        isNavigating = true;
+    });
+
+    // 2. Create dynamic black security overlay (silent blackout to simulate a crash/bug)
     const overlay = document.createElement('div');
     overlay.id = 'antiScreenshotOverlay';
     overlay.style.cssText = `
@@ -243,7 +253,7 @@ function initAntiScreenshot() {
         }, 3000);
     }
 
-    // 2. Prevent PrintScreen keyboard button press
+    // Prevent PrintScreen keyboard button press
     window.addEventListener('keyup', (e) => {
         if (e.key === 'PrintScreen' || e.keyCode === 44) {
             triggerBlocker();
@@ -252,13 +262,15 @@ function initAntiScreenshot() {
         }
     });
 
-    // 3. Prevent Screenshot tools (losing focus / blurring window / tab change)
+    // Prevent Screenshot tools (losing focus / blurring window / tab change)
     window.addEventListener('blur', () => {
+        if (isNavigating) return; // Skip blackout if the user is simply navigating to a different page!
         // Show overlay to blank screen during capture utility activation
         overlay.style.display = 'flex';
     });
 
     window.addEventListener('focus', () => {
+        if (isNavigating) return;
         // Hide overlay with a smooth transition after focus returns
         setTimeout(() => {
             overlay.style.display = 'none';
