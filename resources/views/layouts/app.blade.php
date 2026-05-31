@@ -183,20 +183,20 @@
                 <h4>Plataforma</h4>
                 <a href="/">Explorar</a>
                 <a href="{{ route('register') }}">Seja um Criador</a>
-                <a href="#">Como Funciona</a>
-                <a href="#">Preços</a>
+                <a href="{{ route('pages.how-it-works') }}">Como Funciona</a>
+                <a href="{{ route('pages.pricing') }}">Preços</a>
             </div>
             <div class="footer-col">
                 <h4>Suporte</h4>
-                <a href="#">Central de Ajuda</a>
-                <a href="#">Contato</a>
-                <a href="#">FAQ</a>
+                <a href="{{ route('pages.help-center') }}">Central de Ajuda</a>
+                <a href="{{ route('pages.contact') }}">Contato</a>
+                <a href="{{ route('pages.faq') }}">FAQ</a>
             </div>
             <div class="footer-col">
                 <h4>Legal</h4>
-                <a href="#">Termos de Uso</a>
-                <a href="#">Privacidade</a>
-                <a href="#">Política de Cookies</a>
+                <a href="{{ route('pages.terms') }}">Termos de Uso</a>
+                <a href="{{ route('pages.privacy') }}">Privacidade</a>
+                <a href="{{ route('pages.cookies') }}">Política de Cookies</a>
             </div>
         </div>
         <div class="footer-bottom">

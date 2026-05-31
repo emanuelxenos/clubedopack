@@ -62,5 +62,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 // ── Pack Detail (must be before profile to avoid conflicts) ──
 Route::get('/pack/{slug}', [PackController::class, 'show'])->name('pack.show');
 
+// ── Static / Footer Pages ──
+Route::get('/como-funciona', [\App\Http\Controllers\PageController::class, 'howItWorks'])->name('pages.how-it-works');
+Route::get('/precos', [\App\Http\Controllers\PageController::class, 'pricing'])->name('pages.pricing');
+Route::get('/ajuda', [\App\Http\Controllers\PageController::class, 'helpCenter'])->name('pages.help-center');
+Route::get('/contato', [\App\Http\Controllers\PageController::class, 'contact'])->name('pages.contact');
+Route::post('/contato', [\App\Http\Controllers\PageController::class, 'sendContact']);
+Route::get('/faq', [\App\Http\Controllers\PageController::class, 'faq'])->name('pages.faq');
+Route::get('/termos', [\App\Http\Controllers\PageController::class, 'terms'])->name('pages.terms');
+Route::get('/privacidade', [\App\Http\Controllers\PageController::class, 'privacy'])->name('pages.privacy');
+Route::get('/cookies', [\App\Http\Controllers\PageController::class, 'cookies'])->name('pages.cookies');
+
 // ── Creator Profile (catch-all, must be LAST) ──
 Route::get('/{username}', [ProfileController::class, 'show'])->name('profile.show');
