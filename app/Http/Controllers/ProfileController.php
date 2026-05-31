@@ -10,6 +10,11 @@ class ProfileController extends Controller
 {
     public function show(string $username)
     {
+        // Support both "/username" and "/@username" URLs
+        if (str_starts_with($username, '@')) {
+            $username = substr($username, 1);
+        }
+
         $creator = User::where('username', $username)
             ->where('role', 'creator')
             ->where('is_active', true)

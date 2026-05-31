@@ -20,7 +20,7 @@
 
         <div class="profile-info">
             <h1 class="profile-name">{{ $creator->name }}</h1>
-            <div class="profile-username">@{{ $creator->username }}</div>
+            <div class="profile-username">{{ '@' }}{{ $creator->username }}</div>
             @if($creator->bio)
                 <p class="profile-bio">{{ $creator->bio }}</p>
             @endif

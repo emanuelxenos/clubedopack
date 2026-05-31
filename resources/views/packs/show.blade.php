@@ -132,7 +132,7 @@
                              style="width:50px;height:50px;border-radius:var(--radius-full);object-fit:cover;">
                         <div>
                             <div style="font-weight:600;color:var(--text-primary);">{{ $pack->user->name }}</div>
-                            <div style="font-size:0.85rem;color:var(--text-tertiary);">@{{ $pack->user->username }}</div>
+                            <div style="font-size:0.85rem;color:var(--text-tertiary);">{{ '@' }}{{ $pack->user->username }}</div>
                         </div>
                     </a>
                 </div>
