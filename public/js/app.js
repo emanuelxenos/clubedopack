@@ -295,5 +295,53 @@ function initAntiScreenshot() {
         if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
             e.preventDefault();
         }
+        // F12 key (Inspect)
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            triggerCrash();
+        }
+        // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
+            e.preventDefault();
+            triggerCrash();
+        }
     });
+
+    // 6. Advanced DevTools Detector (Silent Crash & Inspector Freezer)
+    const sizeThreshold = 160;
+    
+    function checkSize() {
+        const widthThreshold = window.outerWidth - window.innerWidth > sizeThreshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > sizeThreshold;
+        if (widthThreshold || heightThreshold) {
+            triggerCrash();
+        }
+    }
+    
+    // Famous custom getter evaluation trick
+    const checkElement = new Image();
+    Object.defineProperty(checkElement, 'id', {
+        get: function() {
+            triggerCrash();
+        }
+    });
+
+    function triggerCrash() {
+        // Completely wipe the HTML and Head to leave them with absolutely zero code to inspect!
+        document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;"></div>';
+        document.head.innerHTML = '';
+        
+        // Spawn high-speed recursive loop calling debugger to freeze the DevTools panel completely!
+        setInterval(function() {
+            debugger;
+        }, 20);
+    }
+
+    // Run active background checks
+    setInterval(() => {
+        // Write checked element to console to trigger getter if Console panel opens
+        console.log('%c', checkElement);
+        console.clear(); // Keep the console visually clean
+        checkSize();
+    }, 400);
 }
