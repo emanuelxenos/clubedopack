@@ -271,15 +271,29 @@ function initAntiScreenshot() {
         }
     });
 
-    // 4. Disable right click, context menu and dragging in the gallery (silent block)
+    // 4. Disable right click, context menu and dragging globally for all images and sensitive containers (silent block)
     document.addEventListener('contextmenu', (e) => {
-        if (e.target.closest('.pack-gallery') || e.target.closest('.pack-image') || e.target.closest('.gallery-item')) {
+        if (
+            e.target.tagName === 'IMG' ||
+            e.target.closest('img') ||
+            e.target.closest('.pack-gallery') || 
+            e.target.closest('.pack-image') || 
+            e.target.closest('.gallery-item') ||
+            e.target.closest('.profile-avatar') ||
+            e.target.closest('.profile-banner')
+        ) {
             e.preventDefault();
         }
     });
 
     document.addEventListener('dragstart', (e) => {
-        if (e.target.closest('.pack-gallery') || e.target.closest('.pack-image') || e.target.closest('.gallery-item')) {
+        if (
+            e.target.tagName === 'IMG' ||
+            e.target.closest('img') ||
+            e.target.closest('.pack-gallery') || 
+            e.target.closest('.pack-image') || 
+            e.target.closest('.gallery-item')
+        ) {
             e.preventDefault();
         }
     });
