@@ -252,7 +252,7 @@ function initAntiScreenshot() {
         }
     });
 
-    // 3. Prevent Screenshot tools (losing focus / blurring window)
+    // 3. Prevent Screenshot tools (losing focus / blurring window / tab change)
     window.addEventListener('blur', () => {
         // Show overlay to blank screen during capture utility activation
         overlay.style.display = 'flex';
@@ -263,6 +263,12 @@ function initAntiScreenshot() {
         setTimeout(() => {
             overlay.style.display = 'none';
         }, 1200);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            overlay.style.display = 'flex';
+        }
     });
 
     // 4. Disable right click, context menu and dragging in the gallery (silent block)
@@ -278,8 +284,13 @@ function initAntiScreenshot() {
         }
     });
 
-    // 5. Disable key combinations (Ctrl+S, Ctrl+U) (silent block)
+    // 5. Disable key combinations and preemptively block system hotkeys (silent block)
     window.addEventListener('keydown', (e) => {
+        // Preemptively trigger blackout when OS capture key modifiers (like Windows Key or PrintScreen) are pressed
+        if (e.key === 'Meta' || e.key === 'PrintScreen' || e.keyCode === 44) {
+            overlay.style.display = 'flex';
+        }
+
         // Ctrl+S (Save page)
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
