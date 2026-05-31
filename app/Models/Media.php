@@ -29,7 +29,7 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('storage/' . $this->file_path);
+        return route('media.stream', $this->id);
     }
 
     public function getThumbnailUrlAttribute(): string

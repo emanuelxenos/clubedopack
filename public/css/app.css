@@ -2105,3 +2105,12 @@ h4 { font-size: 1.25rem; }
 .hidden { display: none !important; }
 .relative { position: relative; }
 .overflow-hidden { overflow: hidden; }
+
+/* ═══════════════════ ANTI-PRINT & SECURITY ═══════════════════ */
+@media print {
+    html, body {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+}

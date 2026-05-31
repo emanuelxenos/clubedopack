@@ -80,7 +80,7 @@ class DashboardController extends Controller
             foreach ($request->file('media_files') as $file) {
                 $extension = strtolower($file->getClientOriginalExtension());
                 $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
-                $path = $file->store('packs/media/' . $pack->id, 'public');
+                $path = $file->store('private/packs/media/' . $pack->id, 'local');
 
                 Media::create([
                     'pack_id' => $pack->id,
@@ -157,7 +157,7 @@ class DashboardController extends Controller
             foreach ($request->file('media_files') as $file) {
                 $extension = strtolower($file->getClientOriginalExtension());
                 $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
-                $path = $file->store('packs/media/' . $pack->id, 'public');
+                $path = $file->store('private/packs/media/' . $pack->id, 'local');
 
                 Media::create([
                     'pack_id' => $pack->id,
@@ -182,9 +182,9 @@ class DashboardController extends Controller
 
         // Delete media files
         foreach ($pack->media as $media) {
-            Storage::disk('public')->delete($media->file_path);
+            Storage::disk('local')->delete($media->file_path);
             if ($media->thumbnail_path) {
-                Storage::disk('public')->delete($media->thumbnail_path);
+                Storage::disk('local')->delete($media->thumbnail_path);
             }
         }
 
@@ -204,9 +204,9 @@ class DashboardController extends Controller
             abort(403);
         }
 
-        Storage::disk('public')->delete($media->file_path);
+        Storage::disk('local')->delete($media->file_path);
         if ($media->thumbnail_path) {
-            Storage::disk('public')->delete($media->thumbnail_path);
+            Storage::disk('local')->delete($media->thumbnail_path);
         }
 
         $media->delete();
