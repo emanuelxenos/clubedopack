@@ -66,21 +66,21 @@
             <h3 style="margin-bottom: var(--space-lg); text-align: center;">Perguntas Frequentes sobre Pagamentos</h3>
             <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
                 <div>
-                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Quando eu recebo meus ganhos?</h4>
+                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Como eu recebo meus ganhos?</h4>
                     <p class="text-secondary" style="font-size: 0.9rem;">
-                        O saldo de vendas é liberado para saque em sua conta bancária de forma rápida. Para vendas via Pix, os valores ficam disponíveis para saque em até 2 dias úteis.
+                        Graças ao nosso sistema de <strong>Split de Pagamento Instantâneo</strong>, os seus ganhos (85% do valor da venda) são transferidos de forma direta para a sua conta Pix no exato momento da compra!
                     </p>
                 </div>
                 <div>
-                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Existe valor mínimo de saque?</h4>
+                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Preciso solicitar saque?</h4>
                     <p class="text-secondary" style="font-size: 0.9rem;">
-                        Sim, o valor mínimo para solicitar a transferência bancária/Pix para sua conta é de R$ 50,00.
+                        Não! Você não precisa acumular saldo ou fazer solicitações de saque. Cada venda realizada gera um repasse Pix imediato. O dinheiro é seu na hora!
                     </p>
                 </div>
                 <div>
-                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Há custos para fazer saques?</h4>
+                    <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Há custos extras de transferência?</h4>
                     <p class="text-secondary" style="font-size: 0.9rem;">
-                        Não! Nós não cobramos nenhuma taxa para processar seus saques bancários. A transferência via Pix é 100% gratuita.
+                        Não! A única taxa é a comissão padrão de 15% retida automaticamente no split. O repasse Pix para a sua conta é 100% gratuito e instantâneo.
                     </p>
                 </div>
             </div>

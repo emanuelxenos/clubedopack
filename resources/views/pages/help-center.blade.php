@@ -32,7 +32,7 @@
                 <div style="font-size: 2rem; margin-bottom: var(--space-sm);">📸</div>
                 <h3 style="font-size: 1.2rem; margin-bottom: var(--space-sm);">Área do Criador</h3>
                 <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: var(--space-md);">
-                    Como criar novos packs, configurar preços de assinaturas, fazer saques e turbinar suas vendas.
+                    Como criar novos packs, configurar preços de assinaturas, ver seus repasses instantâneos e turbinar suas vendas.
                 </p>
                 <a href="{{ route('pages.faq') }}" style="font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
                     Ver artigos ➔

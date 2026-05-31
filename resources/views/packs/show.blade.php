@@ -98,7 +98,7 @@
                                 ✓ Você tem acesso a este pack
                             </div>
                         @else
-                            <form action="{{ route('pack.purchase', $pack) }}" method="POST" style="margin-bottom: var(--space-md);">
+                            <form action="{{ route('pack.purchase', $pack) }}" method="POST" style="margin-bottom: var(--space-md);" onsubmit="return confirm('⚠️ Compra Irreversível\n\nPor se tratar de conteúdo digital com entrega imediata, esta compra NÃO é elegível para reembolso ou estornos. Deseja prosseguir com a compra?')">
                                 @csrf
                                 <button type="submit" class="btn btn-primary btn-block btn-lg">
                                     🛒 Comprar Pack — {{ $pack->formatted_price }}
@@ -107,7 +107,7 @@
 
                             @if($pack->user->subscription_price > 0)
                                 <div style="text-align: center; margin-bottom: var(--space-md); color: var(--text-tertiary); font-size: 0.85rem;">ou</div>
-                                <form action="{{ route('creator.subscribe', $pack->user) }}" method="POST">
+                                <form action="{{ route('creator.subscribe', $pack->user) }}" method="POST" onsubmit="return confirm('⚠️ Assinatura de Conteúdo\n\nPor se tratar de conteúdo digital com entrega imediata, esta assinatura NÃO é elegível para reembolsos fracionados ou estornos. Deseja prosseguir com a assinatura?')">
                                     @csrf
                                     <button type="submit" class="btn btn-outline btn-block">
                                         ✨ Assinar {{ $pack->user->name }} — R$ {{ number_format($pack->user->subscription_price, 2, ',', '.') }}/mês
