@@ -53,6 +53,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'creator',
                 'bio' => 'Fotógrafa e modelo profissional. Conteúdo exclusivo de ensaios sensuais e lifestyle. 📸✨',
                 'subscription_price' => 29.90,
+                'avatar_path' => 'avatars/isabella.png',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ],
@@ -64,6 +65,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'creator',
                 'bio' => 'Personal trainer e influenciadora fitness. Dietas, treinos e ensaios exclusivos. 💪🔥',
                 'subscription_price' => 39.90,
+                'avatar_path' => 'avatars/carolina.png',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ],
@@ -75,6 +77,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'creator',
                 'bio' => 'Cosplayer profissional e artista. Os melhores cosplays e ensaios temáticos! 🎭💜',
                 'subscription_price' => 24.90,
+                'avatar_path' => 'avatars/valentina.png',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ],
@@ -86,6 +89,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'creator',
                 'bio' => 'Modelo e criadora de conteúdo. Moda, beleza e muito mais. 👗💄',
                 'subscription_price' => 34.90,
+                'avatar_path' => 'avatars/fernanda.png',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ],
@@ -106,6 +110,48 @@ class DatabaseSeeder extends Seeder
 
             foreach ($packTitles as $index => $packInfo) {
                 $category = Category::where('slug', $packInfo[1])->first();
+                
+                // Map cover image dynamically based on creator and pack index to ensure maximum variety
+                $coverImage = 'packs/covers/lifestyle_premium.png';
+                $coverMappings = [
+                    'isabellasantos' => [
+                        0 => 'packs/covers/sensual_beach.png',
+                        1 => 'packs/covers/exclusive_premium.png',
+                        2 => 'packs/covers/lifestyle_bts.png',
+                        3 => 'packs/covers/sensual_neon.png',
+                        4 => 'packs/covers/exclusive_gold.png',
+                        5 => 'packs/covers/lifestyle_diary.png',
+                    ],
+                    'carolmendes' => [
+                        0 => 'packs/covers/sensual_studio.png',
+                        1 => 'packs/covers/exclusive_premium.png',
+                        2 => 'packs/covers/lifestyle_premium.png',
+                        3 => 'packs/covers/sensual_artistic.png',
+                        4 => 'packs/covers/fitness_aesthetic.png',
+                        5 => 'packs/covers/lifestyle_diary.png',
+                    ],
+                    'valcosta' => [
+                        0 => 'packs/covers/cosplay_elegant.png',
+                        1 => 'packs/covers/exclusive_gold.png',
+                        2 => 'packs/covers/lifestyle_bts.png',
+                        3 => 'packs/covers/sensual_neon.png',
+                        4 => 'packs/covers/exclusive_premium.png',
+                        5 => 'packs/covers/lifestyle_premium.png',
+                    ],
+                    'fernadalima' => [
+                        0 => 'packs/covers/sensual_sunset.png',
+                        1 => 'packs/covers/exclusive_premium.png',
+                        2 => 'packs/covers/lifestyle_bts.png',
+                        3 => 'packs/covers/sensual_artistic.png',
+                        4 => 'packs/covers/exclusive_gold.png',
+                        5 => 'packs/covers/lifestyle_diary.png',
+                    ],
+                ];
+
+                if (isset($coverMappings[$creator->username][$index])) {
+                    $coverImage = $coverMappings[$creator->username][$index];
+                }
+
                 Pack::create([
                     'user_id' => $creator->id,
                     'category_id' => $category->id,
@@ -113,6 +159,7 @@ class DatabaseSeeder extends Seeder
                     'slug' => Str::slug($packInfo[0]) . '-' . Str::random(6),
                     'description' => $packInfo[2],
                     'price' => $packInfo[3],
+                    'cover_image_path' => $coverImage,
                     'is_active' => true,
                     'is_featured' => $index < 2,
                     'views_count' => rand(50, 500),
