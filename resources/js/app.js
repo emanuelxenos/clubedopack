@@ -283,14 +283,14 @@ function initAntiScreenshot() {
         }
     });
 
-    // 4. Disable right click, context menu and dragging globally for the ENTIRE site unconditionally (silent block)
-    document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-    });
+// 4. Disable right click, context menu and dragging globally for the ENTIRE site unconditionally (silent block)
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+});
 
-    document.addEventListener('dragstart', (e) => {
-        e.preventDefault();
-    });
+document.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+});
 
     // 5. Disable key combinations and preemptively block system hotkeys (silent block)
     window.addEventListener('keydown', (e) => {
