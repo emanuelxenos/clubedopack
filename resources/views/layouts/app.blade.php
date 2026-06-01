@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Clube do Pack') - Marketplace de Conteúdo Exclusivo</title>
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon.png">
     <meta name="theme-color" content="#e91e8c">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -17,9 +18,9 @@
         <div class="header-inner">
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
 
-            <a href="/" class="logo">
-                <div class="logo-icon">🔥</div>
-                <span>Clube do Pack</span>
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/icon.png" alt="Clube do Pack Icon" style="height: 32px; width: 32px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(233, 30, 140, 0.25);">
+                <span style="font-weight: 700; background: linear-gradient(to right, var(--text-primary), #e91e8c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clube do Pack</span>
             </a>
 
             <form action="/" method="GET" class="search-bar">
@@ -89,9 +90,9 @@
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-sidebar" id="mobileSidebar">
         <div class="sidebar-header">
-            <a href="/" class="logo">
-                <div class="logo-icon">🔥</div>
-                <span>Clube do Pack</span>
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="/icon.png" alt="Clube do Pack Icon" style="height: 28px; width: 28px; object-fit: cover; border-radius: 6px;">
+                <span style="font-weight: 700; background: linear-gradient(to right, var(--text-primary), #e91e8c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clube do Pack</span>
             </a>
             <button class="close-btn" id="mobileCloseBtn">✕</button>
         </div>
@@ -175,9 +176,9 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <a href="/" class="logo" style="margin-bottom: var(--space-sm); display: inline-flex;">
-                    <div class="logo-icon">🔥</div>
-                    <span>Clube do Pack</span>
+                <a href="/" class="logo" style="margin-bottom: var(--space-sm); display: inline-flex; align-items: center; gap: 8px;">
+                    <img src="/icon.png" alt="Clube do Pack Icon" style="height: 28px; width: 28px; object-fit: cover; border-radius: 6px;">
+                    <span style="font-weight: 700; background: linear-gradient(to right, var(--text-primary), #e91e8c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clube do Pack</span>
                 </a>
                 <p>A plataforma definitiva para criadores de conteúdo exclusivo. Monetize seu talento e conecte-se com sua audiência.</p>
             </div>
@@ -212,7 +213,7 @@
     {{-- ── PWA Smart Install Banner ── --}}
     <div id="pwa-install-banner" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 480px; background: rgba(13, 14, 18, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(233, 30, 140, 0.3); border-radius: 16px; padding: 14px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 99999; align-items: center; justify-content: space-between; gap: 16px; animation: slideUpPwa 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-            <div style="font-size: 1.5rem; background: var(--bg-tertiary); padding: 8px; border-radius: 10px; box-shadow: 0 4px 10px rgba(233, 30, 140, 0.2);">🔥</div>
+            <img src="/icon.png" alt="Clube do Pack" style="height: 36px; width: 36px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(233, 30, 140, 0.25);">
             <div>
                 <h4 style="margin: 0; color: var(--text-primary); font-size: 0.95rem; font-weight: 700;">Instale o Clube do Pack</h4>
                 <p style="margin: 2px 0 0 0; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.2;">Tenha acesso rápido e em tela cheia na sua tela inicial!</p>
