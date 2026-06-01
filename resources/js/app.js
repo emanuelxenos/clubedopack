@@ -231,7 +231,7 @@ function switchTab(tabName) {
 
 // ═══════════════════ ANTI-SCREENSHOT SYSTEM ═══════════════════
 function initAntiScreenshot() {
-    // 1. Only run print/screenshot/devtools protection on pack gallery (premium content detail) pages to avoid annoying flashes during standard navigation
+    // 1. Only run print/screenshot protection on pack gallery (premium content detail) pages to avoid annoying flashes during standard navigation
     if (!document.querySelector('.pack-gallery')) {
         return;
     }
@@ -292,68 +292,68 @@ function initAntiScreenshot() {
         }
     });
 
-    // 5. Disable key combinations and preemptively block system hotkeys (silent block)
+    setupKeyboardOverlayHook(overlay);
+}
+
+// ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS GLOBAL ──
+const checkElement = new Image();
+Object.defineProperty(checkElement, 'id', {
+    get: function() {
+        triggerCrash();
+    }
+});
+
+function triggerCrash() {
+    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;"></div>';
+    document.head.innerHTML = '';
+    setInterval(function() {
+        debugger;
+    }, 20);
+}
+
+const sizeThreshold = 160;
+function checkSize() {
+    const widthThreshold = window.outerWidth - window.innerWidth > sizeThreshold;
+    const heightThreshold = window.outerHeight - window.innerHeight > sizeThreshold;
+    if (widthThreshold || heightThreshold) {
+        triggerCrash();
+    }
+}
+
+// Run active background checks for DevTools globally
+setInterval(() => {
+    console.log('%c', checkElement);
+    console.clear();
+    checkSize();
+}, 400);
+
+// Disable key combinations and preemptively block system hotkeys globally
+window.addEventListener('keydown', (e) => {
+    // Ctrl+S (Save page)
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+    }
+    // Ctrl+U (View source)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+        e.preventDefault();
+    }
+    // F12 key (Inspect)
+    if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        triggerCrash();
+    }
+    // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
+        e.preventDefault();
+        triggerCrash();
+    }
+});
+
+// Mantém apenas a verificação de tecla Meta e PrintScreen acoplados ao overlay local
+function setupKeyboardOverlayHook(overlay) {
     window.addEventListener('keydown', (e) => {
-        // Preemptively trigger blackout when OS capture key modifiers (like Windows Key or PrintScreen) are pressed
         if (e.key === 'Meta' || e.key === 'PrintScreen' || e.keyCode === 44) {
             overlay.style.display = 'flex';
         }
-
-        // Ctrl+S (Save page)
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();
-        }
-        // Ctrl+U (View source)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-            e.preventDefault();
-        }
-        // F12 key (Inspect)
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            triggerCrash();
-        }
-        // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
-            e.preventDefault();
-            triggerCrash();
-        }
     });
-
-    // 6. Advanced DevTools Detector (Silent Crash & Inspector Freezer)
-    const sizeThreshold = 160;
-    
-    function checkSize() {
-        const widthThreshold = window.outerWidth - window.innerWidth > sizeThreshold;
-        const heightThreshold = window.outerHeight - window.innerHeight > sizeThreshold;
-        if (widthThreshold || heightThreshold) {
-            triggerCrash();
-        }
-    }
-    
-    // Famous custom getter evaluation trick
-    const checkElement = new Image();
-    Object.defineProperty(checkElement, 'id', {
-        get: function() {
-            triggerCrash();
-        }
-    });
-
-    function triggerCrash() {
-        // Completely wipe the HTML and Head to leave them with absolutely zero code to inspect!
-        document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;"></div>';
-        document.head.innerHTML = '';
-        
-        // Spawn high-speed recursive loop calling debugger to freeze the DevTools panel completely!
-        setInterval(function() {
-            debugger;
-        }, 20);
-    }
-
-    // Run active background checks
-    setInterval(() => {
-        // Write checked element to console to trigger getter if Console panel opens
-        console.log('%c', checkElement);
-        console.clear(); // Keep the console visually clean
-        checkSize();
-    }, 400);
 }
