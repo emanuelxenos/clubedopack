@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('banner_path')->nullable();
             $table->decimal('subscription_price', 10, 2)->nullable();
             $table->string('split_account_id')->nullable();
+            $table->date('birth_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

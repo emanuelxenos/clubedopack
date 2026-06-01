@@ -53,6 +53,19 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:creator,customer',
+            'birth_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $age = \Carbon\Carbon::parse($value)->age;
+                    if ($age < 18) {
+                        $fail('Você deve ter pelo menos 18 anos de idade para se cadastrar na plataforma.');
+                    }
+                }
+            ],
+        ], [
+            'birth_date.required' => 'A data de nascimento é obrigatória.',
+            'birth_date.date' => 'Insira uma data de nascimento válida.',
         ]);
 
         // Generate unique username from name
@@ -70,6 +83,7 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
+            'birth_date' => $validated['birth_date'],
             'email_verified_at' => now(),
         ]);
 

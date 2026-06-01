@@ -22,6 +22,7 @@ class User extends Authenticatable
         'subscription_price',
         'split_account_id',
         'is_active',
+        'birth_date',
     ];
 
     protected $hidden = [
@@ -36,6 +37,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'subscription_price' => 'decimal:2',
             'is_active' => 'boolean',
+            'birth_date' => 'date',
         ];
     }
 

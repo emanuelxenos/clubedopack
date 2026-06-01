@@ -69,6 +69,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label" for="birth_date">Data de nascimento</label>
+                    <input type="date" id="birth_date" name="birth_date" class="form-input"
+                           value="{{ old('birth_date') }}" required>
+                    <span style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; display: block;">
+                        ⚠️ Plataforma restrita a maiores de 18 anos.
+                    </span>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label" for="password">Senha</label>
                     <input type="password" id="password" name="password" class="form-input" placeholder="Mínimo 6 caracteres"
                            required>
