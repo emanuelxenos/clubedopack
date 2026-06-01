@@ -23,6 +23,14 @@
                 <a href="{{ route('dashboard.profile') }}" class="{{ request()->routeIs('dashboard.profile*') ? 'active' : '' }}">
                     ⚙️ Meu Perfil
                 </a>
+                <a href="{{ route('dashboard.verify') }}" class="{{ request()->routeIs('dashboard.verify') ? 'active' : '' }}">
+                    🛡️ Verificação de Idade
+                    @if(auth()->user()->verification_status === 'verified')
+                        <span style="color:#00ff88;font-size:0.8rem;margin-left:4px;">✓</span>
+                    @else
+                        <span style="color:#ff3b30;font-size:0.8rem;margin-left:4px;">⚠</span>
+                    @endif
+                </a>
                 <div style="height:1px;background:var(--border-primary);margin:var(--space-md) 0;"></div>
                 <a href="/{{ auth()->user()->username }}">
                     👤 Ver Minha Página

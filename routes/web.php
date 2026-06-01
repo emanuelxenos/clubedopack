@@ -45,6 +45,10 @@ Route::middleware(['auth', 'role:creator'])->prefix('dashboard')->group(function
     Route::get('/earnings', [DashboardController::class, 'earnings'])->name('dashboard.earnings');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('dashboard.profile');
     Route::put('/profile', [DashboardController::class, 'updateProfile'])->name('dashboard.profile.update');
+    
+    // Verificação de Identidade Inteligente (IA local)
+    Route::get('/verify', [\App\Http\Controllers\VerificationController::class, 'showVerificationPage'])->name('dashboard.verify');
+    Route::post('/verify/submit', [\App\Http\Controllers\VerificationController::class, 'submitVerification'])->name('dashboard.verify.submit');
 });
 
 // ── Admin Routes ──

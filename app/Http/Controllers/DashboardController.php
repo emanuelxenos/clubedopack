@@ -43,12 +43,22 @@ class DashboardController extends Controller
 
     public function createPack()
     {
+        $user = auth()->user();
+        if ($user->verification_status !== 'verified') {
+            return redirect()->route('dashboard.verify')->with('warning', 'Para publicar e criar novos packs, primeiro você precisa concluir a verificação biométrica de idade.');
+        }
+
         $categories = Category::where('is_active', true)->orderBy('sort_order')->get();
         return view('dashboard.pack-form', compact('categories'));
     }
 
     public function storePack(Request $request)
     {
+        $user = auth()->user();
+        if ($user->verification_status !== 'verified') {
+            return redirect()->route('dashboard.verify')->with('error', 'Ação não permitida. Verificação de idade obrigatória.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',

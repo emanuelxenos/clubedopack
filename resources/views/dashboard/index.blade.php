@@ -4,7 +4,21 @@
 
 @section('dashboard-content')
     <h1 style="margin-bottom: var(--space-sm);">Olá, {{ auth()->user()->name }} 👋</h1>
-    <p style="color: var(--text-secondary); margin-bottom: var(--space-2xl);">Aqui está um resumo da sua conta.</p>
+    
+    @if(auth()->user()->verification_status !== 'verified')
+        <div style="background: linear-gradient(135deg, rgba(233, 30, 140, 0.15), rgba(233, 30, 140, 0.05)); border: 1px solid rgba(233, 30, 140, 0.3); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-xl); display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span style="font-size: 1.5rem;">🛡️</span>
+                <div>
+                    <h4 style="margin: 0; color: var(--text-primary); font-weight: 600;">Sua conta precisa de verificação de idade</h4>
+                    <p style="margin: 2px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">Para publicar packs e liberar vendas, confirme sua maioridade e biometria facial.</p>
+                </div>
+            </div>
+            <a href="{{ route('dashboard.verify') }}" class="btn btn-primary btn-sm">Verificar Agora</a>
+        </div>
+    @endif
+
+    <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">Aqui está um resumo da sua conta.</p>
 
     {{-- ── Stats Grid ── --}}
     <div class="stats-grid">
