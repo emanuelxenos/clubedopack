@@ -1,0 +1,16 @@
+{
+  "short_name": "Clube do Pack",
+  "name": "Clube do Pack - Premium Content Marketplace",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64 32x32 24x24 16x16"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0d0e12",
+  "theme_color": "#e91e8c",
+  "display": "standalone",
+  "orientation": "portrait"
+}
