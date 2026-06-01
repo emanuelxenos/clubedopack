@@ -247,10 +247,10 @@ document.addEventListener('DOMContentLoaded', function () {
             processingTitle.innerText = "Carregando biometria facial...";
             processingDesc.innerText = "Analisando semelhanças e mapeando traços entre a selfie e a foto do documento...";
 
-            // Carregamos modelos direto da CDN para acelerar a inicialização local
-            await faceapi.nets.tinyFaceDetector.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
+            // Carregamos modelos diretamente do nosso próprio servidor local (alta velocidade)
+            await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+            await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
 
             // Cria elementos HTML de imagens na memória
             const imgDoc = new Image();
