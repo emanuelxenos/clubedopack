@@ -16,9 +16,9 @@
     <div style="background: rgba(233, 30, 140, 0.05); border: 1px solid rgba(233, 30, 140, 0.15); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-xl); display: flex; gap: var(--space-md); align-items: flex-start;">
         <span style="font-size: 1.25rem; color: #e91e8c;">🔒</span>
         <div>
-            <h4 style="margin: 0 0 4px 0; color: var(--text-primary);">Privacidade em Primeiro Lugar</h4>
+            <h4 style="margin: 0 0 4px 0; color: var(--text-primary);">Privacidade e Segurança</h4>
             <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
-                Nós respeitamos a sua privacidade. Todas as imagens e dados biométricos processados durante este teste são validados localmente pela inteligência artificial instalada no seu próprio navegador e **não são armazenados em nossos servidores ou bancos de dados**. Apenas o status da verificação é registrado.
+                Nós respeitamos a sua privacidade. Nenhuma foto do seu documento de identidade ou selfie enviada é armazenada ou salva em nossos servidores e bancos de dados. Os dados são processados de forma estritamente segura e temporária apenas para certificar a sua conta.
             </p>
         </div>
     </div>
@@ -30,9 +30,9 @@
         <div id="step-intro" class="verification-step">
             <h3 style="margin-top: 0;">Como funciona a verificação?</h3>
             <ol style="color: var(--text-secondary); line-height: 1.6; padding-left: var(--space-lg); margin-bottom: var(--space-xl);">
-                <li style="margin-bottom: var(--space-xs);"><strong>Foto do Documento (RG ou CNH):</strong> Faremos uma leitura OCR automática da sua data de nascimento para comprovar seus 18+ anos.</li>
-                <li style="margin-bottom: var(--space-xs);"><strong>Selfie Rápida:</strong> Nossa inteligência artificial local comparará os traços do seu rosto com a foto do documento para garantir que você é realmente o dono dele.</li>
-                <li style="margin-bottom: var(--space-xs);"><strong>Liberação Instantânea:</strong> Passando no teste, sua conta de criador é liberada na hora!</li>
+                <li style="margin-bottom: var(--space-xs);"><strong>Documento Oficial:</strong> Envie uma foto legível do seu documento de identidade (RG ou CNH).</li>
+                <li style="margin-bottom: var(--space-xs);"><strong>Foto de Rosto:</strong> Tire uma selfie nítida sob boa iluminação.</li>
+                <li style="margin-bottom: var(--space-xs);"><strong>Aprovação:</strong> O sistema fará a análise rápida e a liberação de sua conta é instantânea.</li>
             </ol>
 
             <button id="btn-start-verification" class="btn btn-primary" style="width: 100%; padding: var(--space-md); font-weight: 600;">
