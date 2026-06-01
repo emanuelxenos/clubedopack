@@ -267,18 +267,26 @@ document.addEventListener('DOMContentLoaded', function () {
             const detectionDoc = await faceapi.detectSingleFace(imgDoc, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
             const detectionSelfie = await faceapi.detectSingleFace(imgSelfie, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
 
-            let score = 90; // Default Mock de alta semelhança
-
-            if (detectionDoc && detectionSelfie) {
-                // Calcula distância Euclidiana dos descritores faciais
-                const distance = faceapi.euclideanDistance(detectionDoc.descriptor, detectionSelfie.descriptor);
-                // Transforma distância de 0 a 1 em score de 0 a 100
-                score = Math.round((1 - distance) * 100);
+            // EXIGÊNCIA RÍGIDA: Se não detectar rosto em qualquer uma das imagens, barra imediatamente
+            if (!detectionDoc) {
+                showResult(false, "Falha na Leitura do Documento", "Não conseguimos detectar um rosto nítido na foto do seu documento. Certifique-se de que a foto do documento está bem focada e iluminada.");
+                return;
             }
 
-            // Se o score de similaridade for muito baixo (ex: rostos diferentes), rejeita
-            if (score < 40) {
-                showResult(false, "Divergência Biométrica", "O rosto detectado na selfie possui pouca ou nenhuma semelhança com a imagem do documento.");
+            if (!detectionSelfie) {
+                showResult(false, "Falha na Detecção Facial", "Não detectamos seu rosto na selfie. Posicione-se sob um local bem iluminado e olhe para a câmera.");
+                return;
+            }
+
+            // Calcula distância Euclidiana real dos descritores faciais
+            const distance = faceapi.euclideanDistance(detectionDoc.descriptor, detectionSelfie.descriptor);
+            // Transforma distância de 0 a 1 em score de 0 a 100
+            const score = Math.round((1 - distance) * 100);
+            console.log("Score de compatibilidade biométrica calculado:", score);
+
+            // Se o score de similaridade for menor que 65% (rigor de segurança premium), rejeita
+            if (score < 65) {
+                showResult(false, "Divergência Biométrica", "O rosto detectado na selfie possui pouca semelhança com a imagem do documento (" + score + "% de compatibilidade).");
                 return;
             }
 
