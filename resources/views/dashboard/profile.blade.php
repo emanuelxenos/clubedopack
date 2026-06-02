@@ -72,6 +72,34 @@
             <div class="form-hint">Deixe 0 ou vazio se não quiser oferecer assinatura.</div>
         </div>
 
+        {{-- Dados de Repasse (Pix) --}}
+        <div style="margin-top: var(--space-xl); margin-bottom: var(--space-xl); padding: var(--space-md); background: rgba(233, 30, 140, 0.03); border: 1px dashed rgba(233, 30, 140, 0.2); border-radius: var(--radius-md);">
+            <h4 style="margin: 0 0 var(--space-sm) 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                💸 Configurações de Repasse (Pix)
+            </h4>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0 0 var(--space-md) 0;">
+                Cadastre sua chave Pix para receber os pagamentos instantâneos das suas vendas diretamente na sua conta bancária.
+            </p>
+
+            <div class="form-group">
+                <label class="form-label" for="pix_key_type">Tipo de Chave Pix</label>
+                <select id="pix_key_type" name="pix_key_type" class="form-input" style="background: var(--bg-tertiary);">
+                    <option value="" {{ old('pix_key_type', $user->pix_key_type) == '' ? 'selected' : '' }}>Selecione um tipo...</option>
+                    <option value="cpf" {{ old('pix_key_type', $user->pix_key_type) == 'cpf' ? 'selected' : '' }}>CPF</option>
+                    <option value="email" {{ old('pix_key_type', $user->pix_key_type) == 'email' ? 'selected' : '' }}>E-mail</option>
+                    <option value="phone" {{ old('pix_key_type', $user->pix_key_type) == 'phone' ? 'selected' : '' }}>Celular</option>
+                    <option value="random" {{ old('pix_key_type', $user->pix_key_type) == 'random' ? 'selected' : '' }}>Chave Aleatória</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="pix_key">Sua Chave Pix</label>
+                <input type="text" id="pix_key" name="pix_key" class="form-input" 
+                       value="{{ old('pix_key', $user->pix_key) }}" 
+                       placeholder="Insira sua chave Pix aqui...">
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary btn-lg mt-lg">💾 Salvar Perfil</button>
     </form>
 @endsection

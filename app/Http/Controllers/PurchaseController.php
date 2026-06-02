@@ -37,6 +37,9 @@ class PurchaseController extends Controller
             'status' => 'confirmed', // Mock: auto-confirm
         ]);
 
+        // Simula o método de pagamento selecionado (50% de chance de ser Pix ou Cartão para fins de teste local do fluxo)
+        $paymentMethod = rand(0, 1) === 0 ? 'pix' : 'card';
+
         // Create transaction record
         Transaction::create([
             'user_id' => $pack->user_id,
@@ -45,10 +48,18 @@ class PurchaseController extends Controller
             'platform_fee' => $platformFee,
             'creator_amount' => $creatorAmount,
             'status' => 'completed',
-            'description' => "Venda do pack: {$pack->title}",
+            'description' => "Venda do pack: {$pack->title} (" . ($paymentMethod === 'pix' ? 'Pix' : 'Cartão') . ")",
             'transactionable_type' => Purchase::class,
             'transactionable_id' => $purchase->id,
         ]);
+
+        // Atualiza a carteira interna do Criador
+        $creator = $pack->user;
+        if ($paymentMethod === 'pix') {
+            $creator->increment('balance_available', $creatorAmount);
+        } else {
+            $creator->increment('balance_pending', $creatorAmount);
+        }
 
         $pack->increment('downloads_count');
 
@@ -86,6 +97,9 @@ class PurchaseController extends Controller
             'expires_at' => now()->addMonth(),
         ]);
 
+        // Simula o método de pagamento selecionado (50% de chance de ser Pix ou Cartão para fins de teste local do fluxo)
+        $paymentMethod = rand(0, 1) === 0 ? 'pix' : 'card';
+
         // Create transaction record
         Transaction::create([
             'user_id' => $creator->id,
@@ -94,10 +108,17 @@ class PurchaseController extends Controller
             'platform_fee' => $platformFee,
             'creator_amount' => $creatorAmount,
             'status' => 'completed',
-            'description' => "Assinatura de {$user->name}",
+            'description' => "Assinatura de {$user->name} (" . ($paymentMethod === 'pix' ? 'Pix' : 'Cartão') . ")",
             'transactionable_type' => Subscription::class,
             'transactionable_id' => $subscription->id,
         ]);
+
+        // Atualiza a carteira interna do Criador
+        if ($paymentMethod === 'pix') {
+            $creator->increment('balance_available', $creatorAmount);
+        } else {
+            $creator->increment('balance_pending', $creatorAmount);
+        }
 
         return back()->with('success', 'Assinatura ativada com sucesso! Agora você tem acesso a todos os packs deste criador.');
     }

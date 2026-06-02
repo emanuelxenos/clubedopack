@@ -42,10 +42,15 @@
             <div class="stat-value">{{ $subscribersCount }}</div>
             <div class="stat-label">Assinantes</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-value">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</div>
-            <div class="stat-label">Receita Total</div>
+        <div class="stat-card" style="border: 1px solid rgba(0, 255, 136, 0.2); background: rgba(0, 255, 136, 0.02);">
+            <div class="stat-icon" style="color: #00ff88;">💸</div>
+            <div class="stat-value" style="color: #00ff88;">R$ {{ number_format(auth()->user()->balance_available, 2, ',', '.') }}</div>
+            <div class="stat-label">Saldo Disponível (Pix)</div>
+        </div>
+        <div class="stat-card" style="border: 1px solid rgba(233, 30, 140, 0.2); background: rgba(233, 30, 140, 0.02);">
+            <div class="stat-icon" style="color: #e91e8c;">🕒</div>
+            <div class="stat-value" style="color: #e91e8c;">R$ {{ number_format(auth()->user()->balance_pending, 2, ',', '.') }}</div>
+            <div class="stat-label">Saldo Pendente (A liberar)</div>
         </div>
     </div>
 

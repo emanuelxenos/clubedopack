@@ -23,6 +23,10 @@ class User extends Authenticatable
         'split_account_id',
         'is_active',
         'birth_date',
+        'pix_key',
+        'pix_key_type',
+        'balance_available',
+        'balance_pending',
     ];
 
     protected $hidden = [
@@ -38,6 +42,8 @@ class User extends Authenticatable
             'subscription_price' => 'decimal:2',
             'is_active' => 'boolean',
             'birth_date' => 'date',
+            'balance_available' => 'decimal:2',
+            'balance_pending' => 'decimal:2',
         ];
     }
 

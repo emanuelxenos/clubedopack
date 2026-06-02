@@ -258,12 +258,16 @@ class DashboardController extends Controller
             'subscription_price' => 'nullable|numeric|min:0',
             'avatar' => 'nullable|image|max:2048',
             'banner' => 'nullable|image|max:5120',
+            'pix_key_type' => 'nullable|string|in:cpf,email,phone,random',
+            'pix_key' => 'nullable|string|max:255',
         ]);
 
         $user->name = $validated['name'];
         $user->username = $validated['username'];
         $user->bio = $validated['bio'];
         $user->subscription_price = $validated['subscription_price'];
+        $user->pix_key_type = $validated['pix_key_type'] ?? null;
+        $user->pix_key = $validated['pix_key'] ?? null;
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar_path) {
