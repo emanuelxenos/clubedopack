@@ -22,6 +22,11 @@ self.addEventListener('activate', (event) => {
 
 // Responder requisições com cache ou buscar na rede
 self.addEventListener('fetch', (event) => {
+  // IGNORAR requisições ao servidor de desenvolvimento do Vite (porta 5173) ou arquivos do próprio HMR para não quebrar a estilização local
+  if (event.request.url.includes(':5173') || event.request.url.includes('/@vite/') || event.request.url.includes('/resources/')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
