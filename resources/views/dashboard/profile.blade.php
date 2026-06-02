@@ -21,31 +21,68 @@
 
         {{-- Avatar --}}
         <div class="form-group" style="text-align:center;">
-            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+            <img id="avatar-preview-img" src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
                  style="width:100px;height:100px;border-radius:var(--radius-full);object-fit:cover;border:3px solid var(--border-primary);margin-bottom:var(--space-md);">
             <div>
                 <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
                     📷 Alterar Avatar
-                    <input type="file" name="avatar" accept="image/*" style="display:none;" onchange="this.form.querySelector('.avatar-name').textContent = this.files[0]?.name || ''">
+                    <input type="file" name="avatar" accept="image/*" style="display:none;" onchange="previewProfileAvatar(this)">
                 </label>
                 <span class="avatar-name" style="font-size:0.8rem;color:var(--text-tertiary);margin-left:var(--space-sm);"></span>
             </div>
         </div>
 
+        <script>
+            function previewProfileAvatar(input) {
+                const file = input.files[0];
+                if (file) {
+                    if (file.size > 2048 * 1024) {
+                        alert('⚠️ Atenção: Este arquivo tem ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB. O limite máximo permitido para o avatar é de 2MB. Selecione uma imagem menor.');
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('avatar-preview-img').src = e.target.result;
+                        document.querySelector('.avatar-name').textContent = file.name;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
+
         {{-- Banner --}}
         <div class="form-group">
             <label class="form-label">Banner do Perfil</label>
-            @if($user->banner_url)
-                <div style="margin-bottom:var(--space-sm);border-radius:var(--radius-md);overflow:hidden;height:100px;">
-                    <img src="{{ $user->banner_url }}" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-            @endif
-            <div class="upload-zone" style="padding:var(--space-lg);">
-                <input type="file" name="banner" accept="image/*" style="display:none;">
+            <div class="banner-preview-container" style="margin-bottom:var(--space-sm); border-radius:var(--radius-md); overflow:hidden; height:120px; background: var(--bg-tertiary); display: {{ $user->banner_url ? 'block' : 'none' }}; border: 1px solid var(--border-primary);">
+                <img id="banner-preview-img" src="{{ $user->banner_url }}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div class="upload-zone" style="padding:var(--space-lg); cursor: pointer;">
+                <input type="file" name="banner" id="banner-input" accept="image/*" style="display:none;" onchange="previewProfileBanner(this)">
                 <p>Clique para alterar o banner</p>
-                <div class="upload-hint">Tamanho recomendado: 1200x400px</div>
+                <div class="upload-hint">Tamanho máximo: 5MB (Recomendado: 1200x400px)</div>
             </div>
         </div>
+
+        <script>
+            function previewProfileBanner(input) {
+                const file = input.files[0];
+                if (file) {
+                    // Validação prévia de tamanho no front-end para evitar sensação de bug
+                    if (file.size > 5120 * 1024) {
+                        alert('⚠️ Atenção: Este arquivo tem ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB. O limite máximo permitido para o banner é de 5MB. Por favor, selecione uma imagem menor para evitar erros ao salvar.');
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const container = document.querySelector('.banner-preview-container');
+                        const img = document.getElementById('banner-preview-img');
+                        img.src = e.target.result;
+                        container.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
 
         <div class="form-group">
             <label class="form-label" for="name">Nome</label>
