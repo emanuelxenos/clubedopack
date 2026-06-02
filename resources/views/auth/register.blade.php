@@ -10,9 +10,9 @@
     <div class="auth-page">
         <div class="auth-card animate-fade-in-up">
             <div class="auth-header">
-                <a href="/" class="logo" style="justify-content: center; margin-bottom: var(--space-lg);">
-                    <div class="logo-icon">🔥</div>
-                    <span>Clube do Pack</span>
+                <a href="/" class="logo" style="justify-content: center; margin-bottom: var(--space-lg); display: flex; align-items: center; gap: 8px;">
+                    <img src="/icon.png" alt="Clube do Pack Icon" style="height: 36px; width: 36px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(233, 30, 140, 0.25);">
+                    <span style="font-weight: 700; background: linear-gradient(to right, var(--text-primary), #e91e8c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clube do Pack</span>
                 </a>
                 <h1>Crie sua conta</h1>
                 <p>Junte-se à maior plataforma de conteúdo exclusivo</p>
