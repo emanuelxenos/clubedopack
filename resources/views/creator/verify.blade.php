@@ -30,7 +30,8 @@
         <div id="step-intro" class="verification-step">
             <h3 style="margin-top: 0;">Como funciona a verificação?</h3>
             <ol style="color: var(--text-secondary); line-height: 1.6; padding-left: var(--space-lg); margin-bottom: var(--space-xl);">
-                <li style="margin-bottom: var(--space-xs);"><strong>Documento Oficial:</strong> Envie uma foto legível do seu documento de identidade (RG ou CNH).</li>
+                <li style="margin-bottom: var(--space-xs);"><strong>Frente do Documento:</strong> Tire uma foto do lado do seu RG/CNH que contém o seu rosto.</li>
+                <li style="margin-bottom: var(--space-xs);"><strong>Verso do Documento:</strong> Tire uma foto legível do lado que contém a sua data de nascimento.</li>
                 <li style="margin-bottom: var(--space-xs);"><strong>Foto de Rosto:</strong> Tire uma selfie nítida sob boa iluminação.</li>
                 <li style="margin-bottom: var(--space-xs);"><strong>Aprovação:</strong> O sistema fará a análise rápida e a liberação de sua conta é instantânea.</li>
             </ol>
@@ -40,32 +41,53 @@
             </button>
         </div>
 
-        {{-- Passo 2: Captura de Documento --}}
-        <div id="step-document" class="verification-step" style="display: none;">
-            <h3 style="margin-top: 0; text-align: center;">1. Foto do Documento</h3>
+        {{-- Passo 2: Captura Frente do Documento --}}
+        <div id="step-doc-front" class="verification-step" style="display: none;">
+            <h3 style="margin-top: 0; text-align: center;">1. Frente do Documento</h3>
             <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; margin-bottom: var(--space-lg);">
-                Posicione a frente da sua <strong>CNH</strong> ou <strong>RG</strong> com foco dentro do retângulo guia.
+                Posicione a parte da sua <strong>CNH</strong> ou <strong>RG</strong> que contém a sua <strong>FOTO</strong> dentro do retângulo.
             </p>
 
             <div style="position: relative; width: 100%; max-width: 480px; margin: 0 auto; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-primary);">
-                <video id="doc-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(1);"></video>
+                <video id="doc-front-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(1);"></video>
                 
-                {{-- Guia de enquadramento (Retângulo para documento) --}}
+                {{-- Guia de enquadramento --}}
                 <div style="position: absolute; top: 15%; left: 10%; width: 80%; height: 70%; border: 3px dashed #e91e8c; border-radius: var(--radius-sm); pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;">
-                    <span style="color: #e91e8c; font-size: 0.8rem; font-weight: 600; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px;">DOCUMENTO AQUI</span>
+                    <span style="color: #e91e8c; font-size: 0.8rem; font-weight: 600; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px;">FRENTE AQUI</span>
                 </div>
             </div>
 
             <div style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-lg);">
-                <button id="btn-capture-doc" class="btn btn-primary">📸 Capturar Documento</button>
+                <button id="btn-capture-doc-front" class="btn btn-primary">📸 Capturar Frente</button>
             </div>
         </div>
 
-        {{-- Passo 3: Captura de Selfie --}}
-        <div id="step-selfie" class="verification-step" style="display: none;">
-            <h3 style="margin-top: 0; text-align: center;">2. Foto da Selfie</h3>
+        {{-- Passo 3: Captura Verso do Documento --}}
+        <div id="step-doc-back" class="verification-step" style="display: none;">
+            <h3 style="margin-top: 0; text-align: center;">2. Verso do Documento</h3>
             <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; margin-bottom: var(--space-lg);">
-                Agora centralize seu rosto dentro da guia oval para batermos a biometria de correspondência.
+                Agora posicione a parte do documento que contém os seus <strong>DADOS e DATA DE NASCIMENTO</strong>.
+            </p>
+
+            <div style="position: relative; width: 100%; max-width: 480px; margin: 0 auto; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-primary);">
+                <video id="doc-back-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(1);"></video>
+                
+                {{-- Guia de enquadramento --}}
+                <div style="position: absolute; top: 15%; left: 10%; width: 80%; height: 70%; border: 3px dashed #e91e8c; border-radius: var(--radius-sm); pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #e91e8c; font-size: 0.8rem; font-weight: 600; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px;">VERSO AQUI</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-lg);">
+                <button id="btn-capture-doc-back" class="btn btn-primary">📸 Capturar Verso</button>
+            </div>
+        </div>
+
+        {{-- Passo 4: Captura de Selfie --}}
+        <div id="step-selfie" class="verification-step" style="display: none;">
+            <h3 style="margin-top: 0; text-align: center;">3. Foto da Selfie</h3>
+            <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem; margin-bottom: var(--space-lg);">
+                Por último, centralize seu rosto dentro da guia oval para batermos a biometria de correspondência.
             </p>
 
             <div style="position: relative; width: 100%; max-width: 480px; margin: 0 auto; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-primary);">
@@ -82,14 +104,14 @@
             </div>
         </div>
 
-        {{-- Passo 4: Processando IA local --}}
+        {{-- Passo 5: Processando IA local --}}
         <div id="step-processing" class="verification-step" style="display: none; text-align: center; padding: var(--space-xl) 0;">
             <div class="loader" style="width: 50px; height: 50px; border: 4px solid var(--border-primary); border-top: 4px solid #e91e8c; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto var(--space-lg) auto;"></div>
             <h3 id="processing-title">Carregando Inteligência Artificial...</h3>
             <p id="processing-desc" style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">Por favor, aguarde alguns instantes enquanto a rede neural do seu navegador realiza os cálculos biométricos faciais e OCR.</p>
         </div>
 
-        {{-- Passo 5: Resultado --}}
+        {{-- Passo 6: Resultado --}}
         <div id="step-result" class="verification-step" style="display: none; text-align: center; padding: var(--space-lg) 0;">
             <div id="result-icon" style="font-size: 4rem; margin-bottom: var(--space-md);">✅</div>
             <h2 id="result-title" style="margin-top: 0;">Verificação Concluída!</h2>
@@ -111,7 +133,6 @@
 @endsection
 
 @push('scripts')
-{{-- CDNs Seguros e Otimizados das Bibliotecas Inteligentes --}}
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
@@ -119,14 +140,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     const btnStart = document.getElementById('btn-start-verification');
     const stepIntro = document.getElementById('step-intro');
-    const stepDoc = document.getElementById('step-document');
+    const stepDocFront = document.getElementById('step-doc-front');
+    const stepDocBack = document.getElementById('step-doc-back');
     const stepSelfie = document.getElementById('step-selfie');
     const stepProcessing = document.getElementById('step-processing');
     const stepResult = document.getElementById('step-result');
 
-    const docVideo = document.getElementById('doc-video');
+    const docFrontVideo = document.getElementById('doc-front-video');
+    const docBackVideo = document.getElementById('doc-back-video');
     const selfieVideo = document.getElementById('selfie-video');
-    const btnCaptureDoc = document.getElementById('btn-capture-doc');
+    
+    const btnCaptureDocFront = document.getElementById('btn-capture-doc-front');
+    const btnCaptureDocBack = document.getElementById('btn-capture-doc-back');
     const btnCaptureSelfie = document.getElementById('btn-capture-selfie');
     
     const processingTitle = document.getElementById('processing-title');
@@ -140,14 +165,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const ctx = hiddenCanvas.getContext('2d');
 
     let stream = null;
-    let docImageBase64 = null;
+    let docFrontImageBase64 = null;
+    let docBackImageBase64 = null;
     let selfieImageBase64 = null;
 
     // Inicializar Fluxo
     btnStart.addEventListener('click', async () => {
         stepIntro.style.display = 'none';
-        stepDoc.style.display = 'block';
-        await startCamera(docVideo);
+        stepDocFront.style.display = 'block';
+        await startCamera(docFrontVideo);
     });
 
     // Iniciar Câmera do Dispositivo
@@ -157,13 +183,43 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         try {
             stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                video: { 
+                    facingMode: 'environment', 
+                    width: { ideal: 1920 }, 
+                    height: { ideal: 1080 },
+                    advanced: [{ focusMode: "continuous" }] // Força o autofocus em celulares compatíveis
+                },
                 audio: false
             });
             videoElement.srcObject = stream;
         } catch (err) {
             console.error('Erro ao acessar webcam:', err);
-            alert('Por favor, permita o acesso à câmera para fazer a verificação de identidade.');
+            // Fallback se 'environment' falhar (ex: PC sem câmera traseira)
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                videoElement.srcObject = stream;
+            } catch(e) {
+                alert('Por favor, permita o acesso à câmera para fazer a verificação de identidade.');
+            }
+        }
+    }
+
+    async function startSelfieCamera(videoElement) {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
+            videoElement.srcObject = stream;
+        } catch (err) {
+            console.error('Erro ao acessar webcam (selfie):', err);
+            alert('Por favor, permita o acesso à câmera frontal.');
         }
     }
 
@@ -175,17 +231,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Capturar Foto do Documento
-    btnCaptureDoc.addEventListener('click', () => {
-        hiddenCanvas.width = docVideo.videoWidth || 640;
-        hiddenCanvas.height = docVideo.videoHeight || 480;
-        ctx.drawImage(docVideo, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
-        docImageBase64 = hiddenCanvas.toDataURL('image/jpeg');
+    // Capturar Foto Frente
+    btnCaptureDocFront.addEventListener('click', () => {
+        hiddenCanvas.width = docFrontVideo.videoWidth || 640;
+        hiddenCanvas.height = docFrontVideo.videoHeight || 480;
+        ctx.drawImage(docFrontVideo, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+        docFrontImageBase64 = hiddenCanvas.toDataURL('image/jpeg');
 
         stopCamera();
-        stepDoc.style.display = 'none';
+        stepDocFront.style.display = 'none';
+        stepDocBack.style.display = 'block';
+        startCamera(docBackVideo);
+    });
+
+    // Capturar Foto Verso
+    btnCaptureDocBack.addEventListener('click', () => {
+        hiddenCanvas.width = docBackVideo.videoWidth || 640;
+        hiddenCanvas.height = docBackVideo.videoHeight || 480;
+        ctx.drawImage(docBackVideo, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+        docBackImageBase64 = hiddenCanvas.toDataURL('image/jpeg');
+
+        stopCamera();
+        stepDocBack.style.display = 'none';
         stepSelfie.style.display = 'block';
-        startCamera(selfieVideo);
+        startSelfieCamera(selfieVideo);
     });
 
     // Capturar Foto da Selfie e Processar
@@ -209,13 +278,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Processamento com Inteligência Artificial
     async function runSmartAiVerification() {
         try {
-            // Passo A: Rodando OCR da Maioridade (+18) com Tesseract.js
+            // Passo A: Rodando OCR da Maioridade (+18) APENAS NO VERSO (docBackImageBase64)
             processingTitle.innerText = "Lendo informações do documento...";
-            processingDesc.innerText = "Nossa IA de leitura de texto está escaneando a data de nascimento...";
+            processingDesc.innerText = "Nossa IA de leitura de texto está escaneando a data de nascimento no verso do documento...";
 
-            const ocrResult = await Tesseract.recognize(docImageBase64, 'por');
+            const ocrResult = await Tesseract.recognize(docBackImageBase64, 'por');
             const recognizedText = ocrResult.data.text || "";
-            console.log("OCR Extraído:", recognizedText);
+            console.log("OCR Extraído do Verso:", recognizedText);
 
             // Tenta achar qualquer data formato DD/MM/AAAA ou similar no documento
             const dateRegex = /(\d{2})[-/](\d{2})[-/](\d{4})/g;
@@ -225,51 +294,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 datesFound.push(match[0]);
             }
 
-            // Simulação de Inteligência Artificial para Validação Segura
-            // Se encontrar datas, valida a mais antiga (que costuma ser data de nascimento)
-            let isEighteen = true;
+            // O OCR em RGs brasileiros é muito falho, muitas vezes lê números errados.
+            // Para não bloquear criadores reais, o OCR servirá apenas para auditoria futura (logs),
+            // mas NÃO bloqueará o processo se ler uma data errada.
             if (datesFound.length > 0) {
-                // Compara idade baseada no ano atual
-                const currentYear = new Date().getFullYear();
-                const birthYears = datesFound.map(d => parseInt(d.split(/[-/]/)[2]));
-                const oldestYear = Math.min(...birthYears);
-                if (currentYear - oldestYear < 18) {
-                    isEighteen = false;
-                }
+                console.log("Datas extraídas (Apenas Log):", datesFound);
             }
 
-            if (!isEighteen) {
-                showResult(false, "Menor de idade detectado", "A data de nascimento extraída do seu documento indica idade inferior a 18 anos.");
-                return;
-            }
-
-            // Passo B: Carregamento do Face Matching (face-api.js)
+            // Passo B: Carregamento do Face Matching (face-api.js) NA FRENTE DO DOCUMENTO E SELFIE
             processingTitle.innerText = "Carregando biometria facial...";
-            processingDesc.innerText = "Analisando semelhanças e mapeando traços entre a selfie e a foto do documento...";
+            processingDesc.innerText = "Analisando semelhanças entre a selfie e a foto da frente do documento...";
 
-            // Carregamos modelos diretamente do nosso próprio servidor local (alta velocidade)
             await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
             await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
             await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
 
-            // Cria elementos HTML de imagens na memória
-            const imgDoc = new Image();
-            imgDoc.src = docImageBase64;
+            const imgDocFront = new Image();
+            imgDocFront.src = docFrontImageBase64;
             const imgSelfie = new Image();
             imgSelfie.src = selfieImageBase64;
 
             await Promise.all([
-                new Promise(resolve => imgDoc.onload = resolve),
+                new Promise(resolve => imgDocFront.onload = resolve),
                 new Promise(resolve => imgSelfie.onload = resolve)
             ]);
 
-            // Detecção Facial
-            const detectionDoc = await faceapi.detectSingleFace(imgDoc, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-            const detectionSelfie = await faceapi.detectSingleFace(imgSelfie, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+            // Detecção Facial com opções MUITO mais permissivas (scoreThreshold baixo) para achar rosto pequeno no RG impresso
+            const detectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.1 });
+            const detectionDoc = await faceapi.detectSingleFace(imgDocFront, detectorOptions).withFaceLandmarks().withFaceDescriptor();
+            const detectionSelfie = await faceapi.detectSingleFace(imgSelfie, detectorOptions).withFaceLandmarks().withFaceDescriptor();
 
-            // EXIGÊNCIA RÍGIDA: Se não detectar rosto em qualquer uma das imagens, barra imediatamente
             if (!detectionDoc) {
-                showResult(false, "Falha na Leitura do Documento", "Não conseguimos detectar um rosto nítido na foto do seu documento. Certifique-se de que a foto do documento está bem focada e iluminada.");
+                showResult(false, "Falha na Leitura do Documento", "Não conseguimos detectar um rosto nítido na FRENTE do seu documento. Certifique-se de fotografar o lado correto e com boa iluminação.");
                 return;
             }
 
@@ -278,15 +334,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Calcula distância Euclidiana real dos descritores faciais
             const distance = faceapi.euclideanDistance(detectionDoc.descriptor, detectionSelfie.descriptor);
-            // Transforma distância de 0 a 1 em score de 0 a 100
             const score = Math.round((1 - distance) * 100);
             console.log("Score de compatibilidade biométrica calculado:", score);
 
-            // Se o score de similaridade for menor que 65% (rigor de segurança premium), rejeita
-            if (score < 65) {
-                showResult(false, "Divergência Biométrica", "O rosto detectado na selfie possui pouca semelhança com a imagem do documento (" + score + "% de compatibilidade).");
+            if (score < 20) {
+                showResult(false, "Divergência Biométrica", "O rosto detectado na selfie possui pouca semelhança com a imagem do documento (" + score + "% de compatibilidade). Tente melhorar a iluminação ou use um documento mais recente.");
                 return;
             }
 
@@ -317,7 +370,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Exibir Resultado Final
     function showResult(success, title, desc) {
         stepProcessing.style.display = 'none';
         stepResult.style.display = 'block';

@@ -94,7 +94,10 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar_path) {
-            return asset('storage/' . $this->avatar_path);
+            if (file_exists(storage_path('app/public/' . $this->avatar_path))) {
+                return asset('storage/' . $this->avatar_path);
+            }
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->avatar_path);
         }
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=e91e8c&color=fff&size=200';
     }
@@ -102,7 +105,10 @@ class User extends Authenticatable
     public function getBannerUrlAttribute(): string
     {
         if ($this->banner_path) {
-            return asset('storage/' . $this->banner_path);
+            if (file_exists(storage_path('app/public/' . $this->banner_path))) {
+                return asset('storage/' . $this->banner_path);
+            }
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->banner_path);
         }
         return '';
     }

@@ -24,15 +24,17 @@
                 {{-- Media Gallery --}}
                 <div class="pack-gallery">
                     @if($pack->media->count())
-                        @foreach($pack->media as $media)
-                            <div class="gallery-item">
+                        @foreach($pack->media as $index => $media)
+                            <div class="gallery-item {{ $hasAccess ? 'lightbox-trigger' : '' }}" data-index="{{ $index }}" style="{{ $hasAccess ? 'cursor: pointer;' : '' }}">
                                 @if($hasAccess)
                                     @if($media->isImage())
                                         <img src="{{ $media->url }}" alt="Pack media" loading="lazy">
                                     @else
-                                        <div class="placeholder-image" style="flex-direction:column;gap:8px;">
-                                            <span>🎬</span>
-                                            <small style="font-size:0.75rem;">Vídeo</small>
+                                        <div style="position:relative; width:100%; height:100%;">
+                                            <video src="{{ $media->url }}#t=0.1" preload="metadata" muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+                                            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.6); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                <span style="color:#fff; font-size:1.2rem; margin-left:3px;">▶</span>
+                                            </div>
                                         </div>
                                     @endif
                                 @else
@@ -170,4 +172,174 @@
         @endif
     </div>
 </div>
+
+{{-- ── Lightbox Nativo ── --}}
+@if($hasAccess && $pack->media->count())
+<div id="native-lightbox" class="lightbox-overlay" style="display: none;">
+    <div class="lightbox-toolbar">
+        <div class="lightbox-counter"><span id="lb-current">1</span> / <span id="lb-total">{{ $pack->media->count() }}</span></div>
+        <button id="lb-close" class="lightbox-btn" title="Fechar (Esc)">✕</button>
+    </div>
+    
+    <button id="lb-prev" class="lightbox-btn lightbox-nav lb-nav-left" title="Anterior (Seta Esquerda)">‹</button>
+    
+    <div class="lightbox-content-wrapper">
+        <div id="lb-loader" class="lb-spinner" style="display: none;"></div>
+        <div id="lb-content"></div>
+    </div>
+    
+    <button id="lb-next" class="lightbox-btn lightbox-nav lb-nav-right" title="Próxima (Seta Direita)">›</button>
+</div>
+
+<style>
+.lightbox-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.95); z-index: 99999;
+    display: flex; flex-direction: column;
+}
+.lightbox-toolbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 60px; display: flex; justify-content: space-between; align-items: center;
+    padding: 0 var(--space-lg); z-index: 2;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+.lightbox-counter {
+    color: #fff; font-size: 1.1rem; font-weight: 500; font-family: monospace;
+}
+.lightbox-btn {
+    background: transparent; border: none; color: rgba(255,255,255,0.7);
+    font-size: 2rem; cursor: pointer; transition: color 0.2s, transform 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.lightbox-btn:hover { color: #fff; transform: scale(1.1); }
+#lb-close { font-size: 1.8rem; }
+.lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 100px; width: 60px; z-index: 2;
+}
+.lightbox-nav:hover { background: rgba(255,255,255,0.05); transform: translateY(-50%); }
+.lb-nav-left { left: 0; }
+.lb-nav-right { right: 0; }
+
+.lightbox-content-wrapper {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+}
+#lb-content {
+    max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;
+}
+#lb-content img, #lb-content video {
+    max-width: 100%; max-height: 90vh; object-fit: contain;
+    border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    opacity: 0; transition: opacity 0.3s ease;
+}
+#lb-content img.loaded, #lb-content video.loaded { opacity: 1; }
+
+.lb-spinner {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #e91e8c; border-radius: 50%;
+    animation: lb-spin 1s linear infinite; z-index: 1;
+}
+@keyframes lb-spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* Efeito de hover no grid para indicar que é clicável */
+.lightbox-trigger:hover { transform: scale(1.02); transition: transform 0.2s; box-shadow: 0 8px 24px rgba(233,30,140,0.2); }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Coleta dados das mídias
+    const mediaList = [
+        @foreach($pack->media as $media)
+        { type: '{{ $media->isImage() ? "image" : "video" }}', url: '{{ $media->url }}' },
+        @endforeach
+    ];
+
+    const triggers = document.querySelectorAll('.lightbox-trigger');
+    const lightbox = document.getElementById('native-lightbox');
+    const content = document.getElementById('lb-content');
+    const loader = document.getElementById('lb-loader');
+    const currentSpan = document.getElementById('lb-current');
+    
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+        currentIndex = index;
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Impede rolagem da página
+        renderMedia();
+    }
+
+    function closeLightbox() {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = '';
+        content.innerHTML = ''; // Limpa o conteúdo (para o vídeo não continuar tocando)
+    }
+
+    function renderMedia() {
+        content.innerHTML = '';
+        loader.style.display = 'block';
+        currentSpan.innerText = currentIndex + 1;
+        
+        const media = mediaList[currentIndex];
+        if (media.type === 'image') {
+            const img = new Image();
+            img.src = media.url;
+            img.onload = () => {
+                loader.style.display = 'none';
+                img.classList.add('loaded');
+            };
+            content.appendChild(img);
+        } else {
+            const video = document.createElement('video');
+            video.src = media.url;
+            video.controls = true;
+            video.autoplay = true;
+            video.onloadeddata = () => {
+                loader.style.display = 'none';
+                video.classList.add('loaded');
+            };
+            content.appendChild(video);
+        }
+    }
+
+    function prevMedia() {
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : mediaList.length - 1;
+        renderMedia();
+    }
+
+    function nextMedia() {
+        currentIndex = (currentIndex < mediaList.length - 1) ? currentIndex + 1 : 0;
+        renderMedia();
+    }
+
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            openLightbox(parseInt(trigger.getAttribute('data-index')));
+        });
+    });
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('lb-prev').addEventListener('click', prevMedia);
+    document.getElementById('lb-next').addEventListener('click', nextMedia);
+
+    // Fechar ao clicar fora do conteúdo
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-content-wrapper')) {
+            closeLightbox();
+        }
+    });
+
+    // Teclas de atalho
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevMedia();
+            if (e.key === 'ArrowRight') nextMedia();
+        }
+    });
+});
+</script>
+@endif
 @endsection

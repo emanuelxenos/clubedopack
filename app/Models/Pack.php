@@ -74,13 +74,24 @@ class Pack extends Model
     public function getCoverUrlAttribute(): string
     {
         if ($this->cover_image_path) {
-            return asset('storage/' . $this->cover_image_path);
+            // Inteligência: Se a imagem antiga existe no HD físico, puxa dela.
+            if (file_exists(storage_path('app/public/' . $this->cover_image_path))) {
+                return asset('storage/' . $this->cover_image_path);
+            }
+
+            // Se for do disco private, usa o disk local, senão usa o public
+            $disk = str_starts_with($this->cover_image_path, 'private') ? 'local' : 'public';
+            return \Illuminate\Support\Facades\Storage::disk($disk)->url($this->cover_image_path);
         }
 
         // Use first media image as cover
         $firstImage = $this->media()->where('file_type', 'image')->first();
         if ($firstImage) {
-            return asset('storage/' . $firstImage->file_path);
+            if (file_exists(storage_path('app/private/' . $firstImage->file_path))) {
+                // Rota que serve a mídia privada localmente
+                return route('media.show', $firstImage);
+            }
+            return \Illuminate\Support\Facades\Storage::disk('local')->url($firstImage->file_path);
         }
 
         return asset('images/placeholder-pack.jpg');

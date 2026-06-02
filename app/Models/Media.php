@@ -35,7 +35,10 @@ class Media extends Model
     public function getThumbnailUrlAttribute(): string
     {
         if ($this->thumbnail_path) {
-            return asset('storage/' . $this->thumbnail_path);
+            if (file_exists(storage_path('app/private/' . $this->thumbnail_path))) {
+                return route('media.show', $this);
+            }
+            return \Illuminate\Support\Facades\Storage::disk('local')->url($this->thumbnail_path);
         }
         return $this->url;
     }
