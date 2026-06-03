@@ -381,16 +381,24 @@ function initAntiScreenshot() {
 function triggerCrash() {
     document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;"></div>';
     document.head.innerHTML = '';
-    // Trava a aba do navegador
     setInterval(function() {
         debugger;
     }, 50);
 }
 
-// 1. Checagem de DevTools Acoplado (Docked)
+// 1. O TRUQUE CLÁSSICO DO CONSOLE.LOG (Gatilho primário)
+const checkElement = new Image();
+Object.defineProperty(checkElement, 'id', {
+    get: function() {
+        triggerCrash();
+        return 'id';
+    }
+});
+
+// 2. Checagem de DevTools Acoplado (Docked) MUITO sensível
 function checkDockedDevTools() {
-    const threshold = 160;
-    // Se a diferença entre o tamanho real da janela e a área de visualização for muito grande, o DevTools está aberto
+    // 50px de diferença já pega qualquer DevTools aberto, pois as bordas normais são ~16px
+    const threshold = 50;
     const widthDiff = window.outerWidth - window.innerWidth;
     const heightDiff = window.outerHeight - window.innerHeight;
     
@@ -399,18 +407,24 @@ function checkDockedDevTools() {
     }
 }
 window.addEventListener('resize', checkDockedDevTools);
-setInterval(checkDockedDevTools, 1000);
 
-// 2. Timing Attack Seguro (Sem falso positivo)
-// Se o navegador parar por mais de 300ms no "debugger", sabemos que o DevTools capturou a execução
-setInterval(function() {
+// 3. Timing Attack Seguro
+function checkTiming() {
     let start = new Date().getTime();
     debugger;
     let end = new Date().getTime();
-    if (end - start > 300) {
+    if (end - start > 200) {
         triggerCrash();
     }
-}, 1000);
+}
+
+// Executar varredura ativa constante
+setInterval(function() {
+    console.log('%c', checkElement);
+    console.clear();
+    checkDockedDevTools();
+    checkTiming();
+}, 500);
 
 // 3. Bloqueio de Atalhos de Teclado
 window.addEventListener('keydown', (e) => {
