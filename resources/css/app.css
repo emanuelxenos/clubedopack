@@ -1992,7 +1992,7 @@ h4 { font-size: 1.25rem; }
         display: none;
     }
 
-    .header-nav .nav-text {
+    .header-nav > a {
         display: none;
     }
 
