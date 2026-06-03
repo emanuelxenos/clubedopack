@@ -377,23 +377,55 @@ function initAntiScreenshot() {
 }
 
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS GLOBAL ──
-// ── SISTEMA DE SEGURANÇA BÁSICO ──
-// Disable key combinations and preemptively block system hotkeys globally
+// ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS ──
+function triggerCrash() {
+    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;display:flex;align-items:center;justify-content:center;color:red;font-family:monospace;font-size:2rem;font-weight:bold;">❌ ACESSO BLOQUEADO</div>';
+    document.head.innerHTML = '';
+    // Trava a aba do navegador
+    setInterval(function() {
+        debugger;
+    }, 50);
+}
+
+// 1. Checagem de DevTools Acoplado (Docked)
+function checkDockedDevTools() {
+    const threshold = 160;
+    // Se a diferença entre o tamanho real da janela e a área de visualização for muito grande, o DevTools está aberto
+    const widthDiff = window.outerWidth - window.innerWidth;
+    const heightDiff = window.outerHeight - window.innerHeight;
+    
+    if (widthDiff > threshold || heightDiff > threshold) {
+        triggerCrash();
+    }
+}
+window.addEventListener('resize', checkDockedDevTools);
+setInterval(checkDockedDevTools, 1000);
+
+// 2. Timing Attack Seguro (Sem falso positivo)
+// Se o navegador parar por mais de 300ms no "debugger", sabemos que o DevTools capturou a execução
+setInterval(function() {
+    let start = new Date().getTime();
+    debugger;
+    let end = new Date().getTime();
+    if (end - start > 300) {
+        triggerCrash();
+    }
+}, 1000);
+
+// 3. Bloqueio de Atalhos de Teclado
 window.addEventListener('keydown', (e) => {
-    // Ctrl+S (Save page)
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-    }
-    // Ctrl+U (View source)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-        e.preventDefault();
-    }
     // F12 key (Inspect)
     if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
+        triggerCrash();
     }
-    // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
+    // Ctrl+Shift+I, C, J
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
+        e.preventDefault();
+        triggerCrash();
+    }
+    // Ctrl+U / Ctrl+S
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 's')) {
         e.preventDefault();
     }
 });
