@@ -378,55 +378,30 @@ function initAntiScreenshot() {
 
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS GLOBAL ──
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS ──
+import devtoolsDetector from 'devtools-detector';
+
+// ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS ──
 function triggerCrash() {
-    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;"></div>';
-    document.head.innerHTML = '';
+    if (document.body) {
+        document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;"></div>';
+        document.head.innerHTML = '';
+    } else {
+        document.write('<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;"></div>');
+    }
     setInterval(function() {
         debugger;
     }, 50);
 }
 
-// 1. O TRUQUE CLÁSSICO DO CONSOLE.LOG (Gatilho primário)
-const checkElement = new Image();
-Object.defineProperty(checkElement, 'id', {
-    get: function() {
+// Inicializa a detecção profissional (Cobre Undocked, Docked, Console.log, toString, etc sem falsos positivos)
+devtoolsDetector.addListener(function(isOpen) {
+    if (isOpen) {
         triggerCrash();
-        return 'id';
     }
 });
+devtoolsDetector.launch();
 
-// 2. Checagem de DevTools Acoplado (Docked) MUITO sensível
-function checkDockedDevTools() {
-    // 50px de diferença já pega qualquer DevTools aberto, pois as bordas normais são ~16px
-    const threshold = 50;
-    const widthDiff = window.outerWidth - window.innerWidth;
-    const heightDiff = window.outerHeight - window.innerHeight;
-    
-    if (widthDiff > threshold || heightDiff > threshold) {
-        triggerCrash();
-    }
-}
-window.addEventListener('resize', checkDockedDevTools);
-
-// 3. Timing Attack Seguro
-function checkTiming() {
-    let start = new Date().getTime();
-    debugger;
-    let end = new Date().getTime();
-    if (end - start > 200) {
-        triggerCrash();
-    }
-}
-
-// Executar varredura ativa constante
-setInterval(function() {
-    console.log('%c', checkElement);
-    console.clear();
-    checkDockedDevTools();
-    checkTiming();
-}, 500);
-
-// 3. Bloqueio de Atalhos de Teclado
+// Bloqueio de Atalhos de Teclado (Camada Extra)
 window.addEventListener('keydown', (e) => {
     // F12 key (Inspect)
     if (e.key === 'F12' || e.keyCode === 123) {
