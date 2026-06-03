@@ -29,7 +29,14 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return route('media.stream', $this->id);
+        return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'media.stream',
+            now()->addHours(6),
+            [
+                'media' => $this->id,
+                'ip' => request()->ip()
+            ]
+        );
     }
 
     public function getThumbnailUrlAttribute(): string

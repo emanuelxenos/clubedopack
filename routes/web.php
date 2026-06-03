@@ -68,7 +68,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 Route::get('/pack/{slug}', [PackController::class, 'show'])->name('pack.show');
 
 // ── Secure Media Streaming ──
-Route::get('/media/{media}/stream', [\App\Http\Controllers\MediaController::class, 'stream'])->middleware('auth')->name('media.stream');
+Route::get('/media/{media}/stream', [\App\Http\Controllers\MediaController::class, 'stream'])->middleware(['auth', 'signed'])->name('media.stream');
 
 // ── Static / Footer Pages ──
 Route::get('/como-funciona', [\App\Http\Controllers\PageController::class, 'howItWorks'])->name('pages.how-it-works');

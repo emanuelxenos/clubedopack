@@ -7,8 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
-    public function stream(Media $media)
+    public function stream(\Illuminate\Http\Request $request, Media $media)
     {
+        // 0. Validação extra: Bloquear se o IP atual for diferente do IP que assinou a URL
+        if ($request->query('ip') && $request->query('ip') !== $request->ip()) {
+            abort(403, 'Acesso bloqueado por restrição de rede (IP Incompatível).');
+        }
+
         // 1. Check if user is logged in
         if (!auth()->check()) {
             abort(403, 'Acesso não autorizado.');
@@ -27,12 +32,13 @@ class MediaController extends Controller
             abort(404, 'Arquivo de mídia não encontrado no disco seguro.');
         }
 
-        // 4. Return file streaming response
-        $file = Storage::disk('local')->get($path);
-        $mimeType = Storage::disk('local')->mimeType($path);
+        // 4. Return secure binary streamed response with Range Support
+        $absolutePath = Storage::disk('local')->path($path);
 
-        return response($file, 200)
-            ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'private, max-age=86400');
+        return response()->file($absolutePath, [
+            'Cache-Control' => 'private, no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Accept-Ranges' => 'bytes'
+        ]);
     }
 }
