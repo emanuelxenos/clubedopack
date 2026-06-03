@@ -377,37 +377,7 @@ function initAntiScreenshot() {
 }
 
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS GLOBAL ──
-const checkElement = new Image();
-Object.defineProperty(checkElement, 'id', {
-    get: function() {
-        triggerCrash();
-    }
-});
-
-function triggerCrash() {
-    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;"></div>';
-    document.head.innerHTML = '';
-    setInterval(function() {
-        debugger;
-    }, 20);
-}
-
-const sizeThreshold = 160;
-function checkSize() {
-    const widthThreshold = window.outerWidth - window.innerWidth > sizeThreshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > sizeThreshold;
-    if (widthThreshold || heightThreshold) {
-        triggerCrash();
-    }
-}
-
-// Run active background checks for DevTools globally
-setInterval(() => {
-    console.log('%c', checkElement);
-    console.clear();
-    checkSize();
-}, 400);
-
+// ── SISTEMA DE SEGURANÇA BÁSICO ──
 // Disable key combinations and preemptively block system hotkeys globally
 window.addEventListener('keydown', (e) => {
     // Ctrl+S (Save page)
@@ -421,12 +391,10 @@ window.addEventListener('keydown', (e) => {
     // F12 key (Inspect)
     if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
-        triggerCrash();
     }
     // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J (DevTools Shortcuts)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) {
         e.preventDefault();
-        triggerCrash();
     }
 });
 
