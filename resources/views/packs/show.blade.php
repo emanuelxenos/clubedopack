@@ -186,6 +186,16 @@
     <div class="lightbox-content-wrapper">
         <div id="lb-loader" class="lb-spinner" style="display: none;"></div>
         <div id="lb-content"></div>
+        {{-- O watermark original escondido como template --}}
+        <div id="lb-watermark-template" style="display: none;">
+            <div id="lb-watermark-ui" style="display: flex;">
+                <img src="{{ asset('icon.png') }}" alt="Ícone">
+                <div class="lb-wm-text">
+                    <div class="lb-wm-title">Clube do Pack</div>
+                    <div class="lb-wm-user">{{ '@' . $pack->user->username }}</div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <button id="lb-next" class="lightbox-btn lightbox-nav lb-nav-right" title="Próxima (Seta Direita)">›</button>
@@ -243,6 +253,17 @@
 }
 @keyframes lb-spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
+#lb-watermark-ui {
+    position: absolute; bottom: 20px; right: 20px; z-index: 1000;
+    pointer-events: none; opacity: 0.7; align-items: center;
+    /* Removido o fundo preto a pedido do usuário */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8); /* Adicionado sombra sutil para legibilidade em fundo claro */
+}
+#lb-watermark-ui img { width: 40px; height: auto; margin-right: 10px; }
+.lb-wm-text { display: flex; flex-direction: column; text-align: left; }
+.lb-wm-title { font-size: 1.1rem; font-weight: bold; color: rgba(255,255,255,0.9); margin-bottom: 0px; }
+.lb-wm-user { font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+
 /* Efeito de hover no grid para indicar que é clicável */
 .lightbox-trigger:hover { transform: scale(1.02); transition: transform 0.2s; box-shadow: 0 8px 24px rgba(233,30,140,0.2); }
 </style>
@@ -261,20 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('lb-content');
     const loader = document.getElementById('lb-loader');
     const currentSpan = document.getElementById('lb-current');
+    const watermarkTemplate = document.getElementById('lb-watermark-ui');
     
     let currentIndex = 0;
 
     function openLightbox(index) {
         currentIndex = index;
         lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Impede rolagem da página
+        document.body.style.overflow = 'hidden';
         renderMedia();
     }
 
     function closeLightbox() {
         lightbox.style.display = 'none';
         document.body.style.overflow = '';
-        content.innerHTML = ''; // Limpa o conteúdo (para o vídeo não continuar tocando)
+        content.innerHTML = '';
     }
 
     function renderMedia() {
@@ -292,6 +314,12 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             content.appendChild(img);
         } else {
+            const container = document.createElement('div');
+            container.style.position = 'relative';
+            container.style.display = 'inline-block';
+            container.style.maxWidth = '100%';
+            container.style.maxHeight = '90vh';
+            
             const video = document.createElement('video');
             video.src = media.url;
             video.controls = true;
@@ -300,7 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 loader.style.display = 'none';
                 video.classList.add('loaded');
             };
-            content.appendChild(video);
+            
+            container.appendChild(video);
+            
+            // Injeta a marca d'água dentro do container do vídeo (grudado nele!)
+            const wmClone = watermarkTemplate.cloneNode(true);
+            container.appendChild(wmClone);
+            
+            content.appendChild(container);
         }
     }
 

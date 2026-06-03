@@ -41,6 +41,7 @@ Route::middleware(['auth', 'role:creator'])->prefix('dashboard')->group(function
     Route::get('/packs/{pack}/edit', [DashboardController::class, 'editPack'])->name('dashboard.packs.edit');
     Route::put('/packs/{pack}', [DashboardController::class, 'updatePack'])->name('dashboard.packs.update');
     Route::delete('/packs/{pack}', [DashboardController::class, 'destroyPack'])->name('dashboard.packs.destroy');
+    Route::post('/packs/{pack}/media', [DashboardController::class, 'uploadMedia'])->name('dashboard.packs.media.upload');
     Route::delete('/media/{media}', [DashboardController::class, 'deleteMedia'])->name('dashboard.media.destroy');
     Route::get('/earnings', [DashboardController::class, 'earnings'])->name('dashboard.earnings');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('dashboard.profile');

@@ -177,30 +177,29 @@
                     btnCloseError.style.display = 'none';
 
                     const formData = new FormData(packForm);
-                    const xhr = new XMLHttpRequest();
-
-                    xhr.open('POST', packForm.action, true);
-                    xhr.setRequestHeader('Accept', 'application/json'); // Pede para o Laravel retornar erro em JSON se algo falhar
                     
-                    // Monitorando os bytes enviados da máquina do usuário para o servidor
-                    xhr.upload.addEventListener('progress', (event) => {
-                        if (event.lengthComputable) {
-                            let percentComplete = Math.round((event.loaded / event.total) * 100);
-                            progressBar.style.width = percentComplete + '%';
-                            percentageText.innerText = percentComplete + '%';
-                            
-                            if (percentComplete >= 100) {
-                                statusText.innerText = 'Processando na Nuvem...';
-                            }
-                        }
-                    });
-
+                    // Pegar os arquivos selecionados direto do FormData (funciona com drag&drop) e filtra arquivos nulos
+                    const files = formData.getAll('media_files[]').filter(f => f && f.size > 0);
+                    
+                    // Remove os media_files do envio principal (vamos enviar um por um)
+                    formData.delete('media_files[]');
+                    
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', packForm.action, true);
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    
                     xhr.onload = function() {
                         if (xhr.status >= 200 && xhr.status < 300) {
-                            // Laravel Redireciona com sucesso após o Controller
-                            window.location.href = '/dashboard/packs';
+                            let response = JSON.parse(xhr.responseText);
+                            let packId = response.pack_id;
+                            let redirectUrl = response.redirect;
+                            
+                            if (files.length > 0) {
+                                uploadFilesSequentially(packId, files, 0, redirectUrl);
+                            } else {
+                                window.location.href = redirectUrl;
+                            }
                         } else if (xhr.status === 422) {
-                            // Erro de Validação do Laravel (ex: arquivo maior que o permitido)
                             let response = JSON.parse(xhr.responseText);
                             let errorsHtml = '<b>Erros encontrados:</b><ul style="margin-top:10px; padding-left:20px;">';
                             for (let field in response.errors) {
@@ -213,7 +212,6 @@
                             statusText.innerText = 'Ops! Houve um problema.';
                             btnCloseError.style.display = 'block';
                         } else {
-                            // Outro erro de servidor
                             errorBox.innerHTML = 'Erro interno no servidor (' + xhr.status + ').';
                             errorBox.style.display = 'block';
                             statusText.innerText = 'Falha no Upload';
@@ -228,7 +226,77 @@
                         btnCloseError.style.display = 'block';
                     };
 
+                    // Envia os dados básicos do pack primeiro
                     xhr.send(formData);
+                    
+                    function uploadFilesSequentially(packId, filesArray, index, redirectUrl) {
+                        if (index >= filesArray.length) {
+                            // Todos os arquivos terminaram
+                            statusText.innerText = 'Tudo pronto! Redirecionando...';
+                            window.location.href = redirectUrl;
+                            return;
+                        }
+                        
+                        statusText.innerText = `Enviando arquivo ${index + 1} de ${filesArray.length}...`;
+                        
+                        // Progresso global base (o que já foi concluído)
+                        let baseProgress = (index / filesArray.length) * 100;
+                        progressBar.style.width = baseProgress + '%';
+                        percentageText.innerText = Math.round(baseProgress) + '%';
+                        
+                        const fileData = new FormData();
+                        fileData.append('media_file', filesArray[index]);
+                        fileData.append('_token', document.querySelector('input[name="_token"]').value);
+                        
+                        const fileXhr = new XMLHttpRequest();
+                        fileXhr.open('POST', `/dashboard/packs/${packId}/media`, true);
+                        fileXhr.setRequestHeader('Accept', 'application/json');
+                        
+                        fileXhr.upload.addEventListener('progress', (event) => {
+                            if (event.lengthComputable) {
+                                // Progresso do arquivo atual convertido para a escala global
+                                let currentFileProgress = (event.loaded / event.total); // 0 a 1
+                                let percentComplete = baseProgress + (currentFileProgress * (100 / filesArray.length));
+                                
+                                progressBar.style.width = percentComplete + '%';
+                                percentageText.innerText = Math.round(percentComplete) + '%';
+                            }
+                        });
+                        
+                        fileXhr.upload.addEventListener('load', () => {
+                            let endOfFileProgress = baseProgress + (100 / filesArray.length);
+                            progressBar.style.width = endOfFileProgress + '%';
+                            percentageText.innerText = Math.round(endOfFileProgress) + '%';
+                            statusText.innerText = `Processando arquivo ${index + 1}...`;
+                        });
+                        
+                        fileXhr.onload = function() {
+                            if (fileXhr.status >= 200 && fileXhr.status < 300) {
+                                // Envia o próximo
+                                uploadFilesSequentially(packId, filesArray, index + 1, redirectUrl);
+                            } else {
+                                // ERRO NO ENVIO DE UM ARQUIVO: O Pack JÁ EXISTE!
+                                // Então não deixamos o usuário clicar em submit novamente, forçamos o redirect para a edição
+                                errorBox.innerHTML = `Ops! Houve uma falha de conexão no arquivo ${index + 1}.<br><br>Mas não se preocupe! O pack já foi salvo com os arquivos anteriores. Redirecionando para a edição...`;
+                                errorBox.style.display = 'block';
+                                statusText.innerText = 'Falha Parcial no Upload';
+                                setTimeout(() => {
+                                    window.location.href = `/dashboard/packs/${packId}/edit`;
+                                }, 4000);
+                            }
+                        };
+                        
+                        fileXhr.onerror = function() {
+                            errorBox.innerHTML = `Ops! Sua internet caiu ao enviar o arquivo ${index + 1}.<br><br>Mas o pack já foi salvo com os arquivos anteriores. Redirecionando para a edição...`;
+                            errorBox.style.display = 'block';
+                            statusText.innerText = 'Falha Parcial no Upload';
+                            setTimeout(() => {
+                                window.location.href = `/dashboard/packs/${packId}/edit`;
+                            }, 4000);
+                        };
+                        
+                        fileXhr.send(fileData);
+                    }
                 });
 
                 btnCloseError.addEventListener('click', () => {

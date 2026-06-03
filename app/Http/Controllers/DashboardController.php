@@ -88,14 +88,12 @@ class DashboardController extends Controller
         if ($request->hasFile('media_files')) {
             $order = 0;
             foreach ($request->file('media_files') as $file) {
-                $extension = strtolower($file->getClientOriginalExtension());
-                $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
-                $path = $file->store('private/packs/media/' . $pack->id, 'local');
+                $processed = $this->processAndStoreMedia($file, $pack);
 
                 Media::create([
                     'pack_id' => $pack->id,
-                    'file_path' => $path,
-                    'file_type' => $fileType,
+                    'file_path' => $processed['path'],
+                    'file_type' => $processed['type'],
                     'size' => $file->getSize(),
                     'sort_order' => $order++,
                 ]);
@@ -103,7 +101,6 @@ class DashboardController extends Controller
 
             $pack->update(['media_count' => $order]);
 
-            // Auto-set cover if not provided
             if (!$pack->cover_image_path) {
                 $firstImage = $pack->media()->where('file_type', 'image')->first();
                 if ($firstImage) {
@@ -112,6 +109,9 @@ class DashboardController extends Controller
             }
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['pack_id' => $pack->id, 'redirect' => '/dashboard/packs']);
+        }
         return redirect('/dashboard/packs')->with('success', 'Pack criado com sucesso!');
     }
 
@@ -165,23 +165,131 @@ class DashboardController extends Controller
             $order = $maxOrder + 1;
 
             foreach ($request->file('media_files') as $file) {
-                $extension = strtolower($file->getClientOriginalExtension());
-                $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
-                $path = $file->store('private/packs/media/' . $pack->id, 'local');
+                $processed = $this->processAndStoreMedia($file, $pack);
 
                 Media::create([
                     'pack_id' => $pack->id,
-                    'file_path' => $path,
-                    'file_type' => $fileType,
+                    'file_path' => $processed['path'],
+                    'file_type' => $processed['type'],
                     'size' => $file->getSize(),
                     'sort_order' => $order++,
                 ]);
             }
 
-            $pack->update(['media_count' => $pack->media()->count()]);
+            $pack->update(['media_count' => $order]);
         }
 
+        $pack->update(['media_count' => $pack->media()->count()]);
+        
+        if ($request->wantsJson()) {
+            return response()->json(['pack_id' => $pack->id, 'redirect' => '/dashboard/packs']);
+        }
         return redirect('/dashboard/packs')->with('success', 'Pack atualizado com sucesso!');
+    }
+
+    public function uploadMedia(Request $request, Pack $pack)
+    {
+        if ($pack->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'media_file' => 'required|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,webm|max:512000', // 500MB max per file
+        ]);
+
+        $file = $request->file('media_file');
+        
+        $maxOrder = $pack->media()->max('sort_order') ?? -1;
+        $order = $maxOrder + 1;
+
+        $processed = $this->processAndStoreMedia($file, $pack);
+
+        Media::create([
+            'pack_id' => $pack->id,
+            'file_path' => $processed['path'],
+            'file_type' => $processed['type'],
+            'size' => $file->getSize(),
+            'sort_order' => $order,
+        ]);
+
+        $pack->update(['media_count' => $pack->media()->count()]);
+
+        // Auto-set cover if not provided
+        if (!$pack->cover_image_path && $processed['type'] === 'image') {
+            $pack->update(['cover_image_path' => $processed['path']]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+
+    private function processAndStoreMedia($file, $pack)
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+        $fileType = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
+        
+        // Aplica Marca D'água apenas em Imagens
+        if ($fileType === 'image') {
+            try {
+                $image = \Intervention\Image\ImageManagerStatic::make($file->getRealPath());
+                $iconPath = public_path('icon.png');
+                $fontPath = public_path('fonts/arial.ttf'); // Usando Arial para escalar sem falhar no GD do Windows
+                
+                if (file_exists($iconPath)) {
+                    $logoWidth = max(50, intval($image->width() * 0.05)); // 5% da imagem, min 50px
+                    $logo = \Intervention\Image\ImageManagerStatic::make($iconPath)->widen($logoWidth)->opacity(70);
+                    
+                    $marginRight = max(10, intval($image->width() * 0.015));
+                    $marginBottom = max(10, intval($image->height() * 0.015));
+                    
+                    if (file_exists($fontPath)) {
+                        $fontSizeTitle = max(14, intval($logoWidth * 0.45));
+                        $fontSizeUser = max(10, intval($logoWidth * 0.35));
+                        // Estimativa mais larga para o TTF
+                        $estimatedTextWidth = intval($fontSizeTitle * 8.5); 
+                        
+                        $logoX = $image->width() - $marginRight - $estimatedTextWidth - $logoWidth - 15;
+                        $logoY = $image->height() - $marginBottom - $logoWidth;
+                        
+                        $image->insert($logo, 'top-left', $logoX, $logoY);
+                        
+                        $textX = $logoX + $logoWidth + 15;
+                        $textYTitle = $logoY + intval($logoWidth * 0.45);
+                        $textYUser = $logoY + intval($logoWidth * 0.9);
+                        
+                        $image->text('Clube do Pack', $textX, $textYTitle, function($font) use ($fontPath, $fontSizeTitle) {
+                            $font->file($fontPath);
+                            $font->size($fontSizeTitle);
+                            $font->color(array(255, 255, 255, 0.9));
+                            $font->align('left');
+                        });
+                        $image->text('@' . $pack->user->username, $textX, $textYUser, function($font) use ($fontPath, $fontSizeUser) {
+                            $font->file($fontPath);
+                            $font->size($fontSizeUser);
+                            $font->color(array(255, 255, 255, 0.9));
+                            $font->align('left');
+                        });
+                    } else {
+                        // Se o Arial falhar por algum motivo bizarro, usa apenas o logo limpo
+                        $logoX = $image->width() - $marginRight - $logoWidth;
+                        $logoY = $image->height() - $marginBottom - $logoWidth;
+                        $image->insert($logo, 'top-left', $logoX, $logoY);
+                    }
+                }
+                
+                $hashName = \Illuminate\Support\Str::random(40) . '.' . $extension;
+                $path = 'private/packs/media/' . $pack->id . '/' . $hashName;
+                \Illuminate\Support\Facades\Storage::disk('local')->put($path, (string) $image->encode());
+                
+                return ['path' => $path, 'type' => 'image'];
+            } catch (\Exception $e) {
+                // Em caso de falha (ex: imagem corrompida, memória esgotada), cai no fallback abaixo
+            }
+        }
+        
+        // Fallback e Vídeos
+        $path = $file->store('private/packs/media/' . $pack->id, 'local');
+        return ['path' => $path, 'type' => $fileType];
     }
 
     public function destroyPack(Pack $pack)
