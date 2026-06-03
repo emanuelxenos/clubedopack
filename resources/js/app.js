@@ -379,7 +379,7 @@ function initAntiScreenshot() {
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS GLOBAL ──
 // ── SISTEMA DE SEGURANÇA E BLOQUEIO DE DEVTOOLS ──
 function triggerCrash() {
-    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;display:flex;align-items:center;justify-content:center;color:red;font-family:monospace;font-size:2rem;font-weight:bold;">❌ ACESSO BLOQUEADO</div>';
+    document.body.innerHTML = '<div style="background:#000000;width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:9999999;"></div>';
     document.head.innerHTML = '';
     // Trava a aba do navegador
     setInterval(function() {
