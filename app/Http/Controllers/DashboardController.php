@@ -149,12 +149,27 @@ class DashboardController extends Controller
         $pack->price = $validated['price'];
         $pack->is_active = $request->boolean('is_active', true);
 
+        // Check for PHP upload errors (like exceeding upload_max_filesize)
+        if ($request->has('cover_image') || $request->file('cover_image')) {
+            $file = $request->file('cover_image');
+            if ($file && !$file->isValid()) {
+                return response()->json([
+                    'message' => 'The given data was invalid.',
+                    'errors' => ['cover_image' => ['A imagem excede o limite de tamanho do servidor (PHP ini).']]
+                ], 422);
+            }
+        }
+
         if ($request->hasFile('cover_image')) {
+            \Log::info("Cover image received in updatePack for Pack ID: " . $pack->id);
             if ($pack->cover_image_path) {
                 Storage::disk('public')->delete($pack->cover_image_path);
             }
             $path = $request->file('cover_image')->store('packs/covers', 'public');
             $pack->cover_image_path = $path;
+            \Log::info("New cover image path: " . $path);
+        } else {
+            \Log::info("No cover image received in updatePack for Pack ID: " . $pack->id);
         }
 
         $pack->save();

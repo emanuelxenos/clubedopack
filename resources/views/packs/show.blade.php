@@ -324,6 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
             video.src = media.url;
             video.controls = true;
             video.autoplay = true;
+            video.setAttribute('controlsList', 'nodownload');
+            video.oncontextmenu = (e) => e.preventDefault();
+            
             video.onloadeddata = () => {
                 loader.style.display = 'none';
                 video.classList.add('loaded');

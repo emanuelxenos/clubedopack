@@ -197,9 +197,90 @@ function initUploadZones() {
 function initDeleteConfirmations() {
     document.querySelectorAll('[data-confirm]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!confirm(btn.dataset.confirm || 'Tem certeza?')) {
-                e.preventDefault();
+            e.preventDefault();
+            const message = btn.dataset.confirm || 'Tem certeza que deseja continuar?';
+            const form = btn.closest('form');
+
+            // Criar modal dinâmico
+            const modalOverlay = document.createElement('div');
+            modalOverlay.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+                z-index: 999999; display: flex; align-items: center; justify-content: center;
+                animation: fadeIn 0.2s ease;
+            `;
+
+            const modalBox = document.createElement('div');
+            modalBox.style.cssText = `
+                background: var(--bg-secondary); border: 1px solid var(--border-primary);
+                border-radius: var(--radius-lg); padding: var(--space-xl);
+                max-width: 400px; width: 90%; text-align: center;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: scale(0.95);
+                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            `;
+
+            modalBox.innerHTML = `
+                <div style="font-size: 3rem; margin-bottom: var(--space-sm);">⚠️</div>
+                <h3 style="margin-bottom: var(--space-md); color: var(--text-primary);">Atenção</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-xl);">${message}</p>
+                <div style="display: flex; gap: var(--space-md); justify-content: center;">
+                    <button id="modal-cancel" class="btn btn-secondary">Cancelar</button>
+                    <button id="modal-confirm" class="btn btn-danger">Sim, continuar</button>
+                </div>
+            `;
+
+            modalOverlay.appendChild(modalBox);
+            document.body.appendChild(modalOverlay);
+
+            // Animações inline
+            if (!document.getElementById('modal-animations')) {
+                const style = document.createElement('style');
+                style.id = 'modal-animations';
+                style.innerHTML = `
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                `;
+                document.head.appendChild(style);
             }
+
+            const closeModal = () => {
+                modalOverlay.style.animation = 'fadeIn 0.2s ease reverse';
+                setTimeout(() => modalOverlay.remove(), 190);
+            };
+
+            modalBox.querySelector('#modal-cancel').addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (ev) => {
+                if (ev.target === modalOverlay) closeModal();
+            });
+
+            modalBox.querySelector('#modal-confirm').addEventListener('click', () => {
+                closeModal();
+                if (btn.dataset.deleteUrl) {
+                    const dynamicForm = document.createElement('form');
+                    dynamicForm.method = 'POST';
+                    dynamicForm.action = btn.dataset.deleteUrl;
+                    
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value;
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = csrfToken;
+                    
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    
+                    dynamicForm.appendChild(csrfInput);
+                    dynamicForm.appendChild(methodInput);
+                    document.body.appendChild(dynamicForm);
+                    dynamicForm.submit();
+                } else if (form) {
+                    form.submit();
+                } else {
+                    // Para casos sem formulário (se houver no futuro)
+                    window.location.href = btn.getAttribute('href');
+                }
+            });
         });
     });
 }

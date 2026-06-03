@@ -18,9 +18,7 @@
     <form id="pack-form" action="{{ isset($pack) ? route('dashboard.packs.update', $pack) : route('dashboard.packs.store') }}"
           method="POST" enctype="multipart/form-data" style="max-width: 700px;">
         @csrf
-        @if(isset($pack))
-            @method('PUT')
-        @endif
+        @csrf
 
         <div class="form-group">
             <label class="form-label" for="title">Título do Pack *</label>
@@ -98,11 +96,7 @@
                                 @else
                                     <div class="placeholder-image">🎬</div>
                                 @endif
-                                <form action="{{ route('dashboard.media.destroy', $media) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="remove-btn" data-confirm="Remover este arquivo?">✕</button>
-                                </form>
+                                <button type="button" class="remove-btn" data-delete-url="{{ route('dashboard.media.destroy', $media) }}" data-confirm="Remover este arquivo?">✕</button>
                             </div>
                         @endforeach
                     </div>
