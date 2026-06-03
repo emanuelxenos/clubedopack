@@ -1093,6 +1093,12 @@ h4 { font-size: 1.25rem; }
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.pack-sidebar .btn {
+    white-space: normal;
+    text-align: center;
 }
 
 .pack-sidebar .pack-price-main {
@@ -2011,6 +2017,10 @@ main:has(.dashboard-layout) + .footer {
     }
     .header {
         padding: 0 var(--space-md);
+    }
+
+    .header-inner {
+        gap: var(--space-sm);
     }
 
     .search-bar, .logo-text, .header-create-btn {
