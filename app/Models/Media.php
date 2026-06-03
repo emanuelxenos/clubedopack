@@ -34,7 +34,8 @@ class Media extends Model
             now()->addHours(6),
             [
                 'media' => $this->id,
-                'ip' => request()->ip()
+                'ip' => request()->ip(),
+                'uid' => auth()->id()
             ]
         );
     }
