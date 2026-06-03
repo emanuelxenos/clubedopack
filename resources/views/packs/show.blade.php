@@ -203,7 +203,7 @@
 
 <style>
 .lightbox-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
     background: rgba(0, 0, 0, 0.95); z-index: 99999;
     display: flex; flex-direction: column;
 }
@@ -270,12 +270,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Coleta dados das mídias
-    const mediaList = [
-        @foreach($pack->media as $media)
-        { type: '{{ $media->isImage() ? "image" : "video" }}', url: '{{ $media->url }}' },
-        @endforeach
-    ];
+    // Coleta dados das mídias com json_encode para evitar que o Blade converta & em &amp; (isso quebra a URL assinada)
+    const mediaList = {!! json_encode($pack->media->map(function($media) {
+        return [
+            'type' => $media->isImage() ? 'image' : 'video',
+            'url' => $media->url
+        ];
+    })->toArray()) !!};
 
     const triggers = document.querySelectorAll('.lightbox-trigger');
     const lightbox = document.getElementById('native-lightbox');
@@ -311,6 +312,15 @@ document.addEventListener('DOMContentLoaded', () => {
             img.onload = () => {
                 loader.style.display = 'none';
                 img.classList.add('loaded');
+            };
+            img.onerror = () => {
+                loader.style.display = 'none';
+                img.alt = 'Erro ao carregar imagem';
+                img.style.opacity = 1;
+                // Adiciona uma borda vermelha e um texto para indicar que falhou
+                img.style.border = '2px solid red';
+                img.style.padding = '20px';
+                img.style.backgroundColor = 'rgba(255,0,0,0.1)';
             };
             content.appendChild(img);
         } else {
