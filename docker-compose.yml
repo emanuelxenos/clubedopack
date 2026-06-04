@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # O servidor Web principal (Laravel App + Nginx)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: clubedopack-app:latest
+    restart: always
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    volumes:
+      - ./storage/app:/var/www/html/storage/app
+    depends_on:
+      - db
+      - redis
+
+  # O processador de Filas (essencial para webhooks de pagamento)
+  queue:
+    image: clubedopack-app:latest
+    restart: always
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    env_file:
+      - .env
+    volumes:
+      - ./storage/app:/var/www/html/storage/app
+    depends_on:
+      - db
+      - redis
+
+  # O agendador de tarefas (essencial para rodar a liberação de saldo)
+  scheduler:
+    image: clubedopack-app:latest
+    restart: always
+    command: php artisan schedule:work
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+  # Banco de Dados
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-clubedopack}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  # Redis para Filas e Cache
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  db-data:
+  redis-data:
