@@ -40,12 +40,9 @@
         <div class="profile-actions">
             @auth
                 @if(!$isSubscribed && $creator->subscription_price > 0 && auth()->id() !== $creator->id)
-                    <form action="{{ route('creator.subscribe', $creator) }}" method="POST" onsubmit="return confirm('⚠️ Assinatura de Conteúdo\n\nPor se tratar de conteúdo digital com entrega imediata, esta assinatura NÃO é elegível para reembolsos fracionados ou estornos. Deseja prosseguir com a assinatura?')">
-                        @csrf
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            ✨ Assinar — R$ {{ number_format($creator->subscription_price, 2, ',', '.') }}/mês
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="openCheckoutModal('subscription', '{{ $creator->username }}', 'Assinatura: {{ $creator->name }}', 'R$ {{ number_format($creator->subscription_price, 2, ',', '.') }}/mês')">
+                        ✨ Assinar — R$ {{ number_format($creator->subscription_price, 2, ',', '.') }}/mês
+                    </button>
                 @elseif($isSubscribed)
                     <span class="btn btn-success btn-lg" style="cursor:default;">✓ Assinante</span>
                 @endif

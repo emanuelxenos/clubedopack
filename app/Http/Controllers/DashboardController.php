@@ -360,8 +360,9 @@ class DashboardController extends Controller
             ->sum('creator_amount');
 
         $transactions = $user->transactions()->latest()->paginate(15);
+        $withdrawals = $user->withdrawals()->latest()->get();
 
-        return view('dashboard.earnings', compact('totalEarnings', 'monthlyEarnings', 'transactions'));
+        return view('dashboard.earnings', compact('totalEarnings', 'monthlyEarnings', 'transactions', 'withdrawals'));
     }
 
     public function profile()

@@ -17,6 +17,7 @@ class Transaction extends Model
         'creator_amount',
         'gateway_id',
         'status',
+        'is_released',
         'description',
         'transactionable_type',
         'transactionable_id',
@@ -26,6 +27,7 @@ class Transaction extends Model
         'amount' => 'decimal:2',
         'platform_fee' => 'decimal:2',
         'creator_amount' => 'decimal:2',
+        'is_released' => 'boolean',
     ];
 
     public function user()

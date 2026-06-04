@@ -275,6 +275,326 @@
         });
     </script>
 
+    {{-- Global Checkout Modal --}}
+    @auth
+    <div id="global-checkout-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 100000; justify-content: center; align-items: center; padding: 20px;">
+        <div class="modal-card" style="background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); width: 100%; max-width: 480px; box-shadow: var(--shadow-xl); overflow: hidden; animation: modalFadeIn 0.3s ease;">
+            <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+                <h3 id="checkout-title" style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Finalizar Compra</h3>
+                <button onclick="closeCheckoutModal()" style="background: none; border: none; color: var(--text-tertiary); font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+            </div>
+
+            <form id="checkout-form" method="POST" action="" style="padding: 24px; max-height: calc(100vh - 120px); overflow-y: auto;">
+                @csrf
+                
+                <div id="checkout-price-display" style="text-align: center; margin-bottom: var(--space-lg); font-size: 2rem; font-weight: 800; color: var(--accent-primary); text-shadow: var(--shadow-glow);">
+                    R$ 0,00
+                </div>
+
+                {{-- Método de Pagamento --}}
+                <div style="margin-bottom: var(--space-lg);">
+                    <label style="display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 8px; font-weight: 600;">Forma de Pagamento</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                        <label class="pay-method-option" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; border: 2px solid var(--accent-primary); border-radius: var(--radius-md); cursor: pointer; background: rgba(233,30,140,0.05); transition: all var(--transition-fast);">
+                            <input type="radio" name="payment_method" value="pix" checked style="display: none;" onchange="togglePaymentMethod('pix')">
+                            <span style="font-size: 1.5rem;">⚡</span>
+                            <span style="font-weight: 600; font-size: 0.9rem; color: #fff;">Pix (Imediato)</span>
+                        </label>
+                        <label class="pay-method-option" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; border: 2px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast);">
+                            <input type="radio" name="payment_method" value="credit_card" style="display: none;" onchange="togglePaymentMethod('credit_card')">
+                            <span style="font-size: 1.5rem;">💳</span>
+                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">Cartão de Crédito</span>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Formulário de Cartão --}}
+                <div id="credit-card-form" style="display: none; animation: slideDown 0.3s ease;">
+                    <div style="margin-bottom: var(--space-md);">
+                        <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">Número do Cartão</label>
+                        <input type="text" name="card_number" id="card_number" class="form-input" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+
+                    <div style="margin-bottom: var(--space-md);">
+                        <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">Nome Impresso no Cartão</label>
+                        <input type="text" name="card_name" class="form-input" placeholder="COMO NO CARTÃO" style="text-transform: uppercase;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md);">
+                        <div>
+                            <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">Validade</label>
+                            <input type="text" name="card_expiry" id="card_expiry" class="form-input" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div>
+                            <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">CVV</label>
+                            <input type="text" name="card_cvv" class="form-input" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-primary); margin: var(--space-lg) 0; padding-top: var(--space-md);">
+                        <h4 style="margin: 0 0 var(--space-md) 0; font-size: 0.9rem; color: var(--text-primary); font-weight: 600;">Dados de Cobrança</h4>
+                        
+                        <div style="margin-bottom: var(--space-md);">
+                            <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">CPF do Titular</label>
+                            <input type="text" name="holder_cpf" id="holder_cpf" class="form-input" placeholder="000.000.000-00" maxlength="14">
+                        </div>
+
+                        <div style="margin-bottom: var(--space-md);">
+                            <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">Celular do Titular</label>
+                            <input type="text" name="holder_phone" id="holder_phone" class="form-input" placeholder="(00) 90000-0000" maxlength="15">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-md);">
+                            <div>
+                                <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">CEP</label>
+                                <input type="text" name="holder_zip" id="holder_zip" class="form-input" placeholder="00000-000" maxlength="9">
+                            </div>
+                            <div>
+                                <label class="form-label" style="display:block;margin-bottom:6px;font-size:0.85rem;">Número Residencial</label>
+                                <input type="text" name="holder_address_num" class="form-input" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: var(--space-md);">
+                    Confirmar e Pagar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal de Pagamento Pix --}}
+    @if(session('show_pix_modal'))
+    <div id="pix-payment-modal" class="modal-overlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 100001; justify-content: center; align-items: center; padding: 20px;">
+        <div class="modal-card" style="background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); width: 100%; max-width: 440px; box-shadow: var(--shadow-xl); text-align: center; padding: 30px; animation: modalFadeIn 0.3s ease;">
+            <h3 style="margin: 0 0 10px 0; color: var(--text-primary); font-weight: 700; font-size: 1.3rem;">⚡ Pagamento via PIX</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Escaneie o QR Code abaixo ou copie a chave copia e cola para pagar.</p>
+            
+            <div style="background: white; padding: 16px; border-radius: var(--radius-md); display: inline-block; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <img src="data:image/png;base64,{{ session('pix_qr_base64') }}" alt="QR Code Pix" style="width: 200px; height: 200px; display: block;">
+            </div>
+
+            <div style="margin-bottom: 25px; text-align: left;">
+                <label style="display:block; font-size:0.8rem; color:var(--text-tertiary); margin-bottom:6px; text-transform:uppercase; font-weight:600;">Pix Copia e Cola</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="pix-emv-input" class="form-input" value="{{ session('pix_copy_paste') }}" readonly style="font-family: monospace; font-size: 0.8rem; flex: 1;">
+                    <button onclick="copyPixCode()" class="btn btn-primary" style="white-space: nowrap; padding: 0 16px; font-size: 0.9rem;">Copiar</button>
+                </div>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: var(--radius-md); border: 1px dashed rgba(255,255,255,0.1); margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <div class="lb-spinner" style="position:static; transform:none; width: 16px; height: 16px; border-width: 2px;"></div>
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">Aguardando confirmação do pagamento...</span>
+            </div>
+
+            <button onclick="closePixModal()" class="btn btn-block" style="background: rgba(255,255,255,0.05); color: var(--text-secondary);">Fechar</button>
+            @if(config('app.env') === 'local')
+                <button onclick="simulatePixPayment('{{ session('purchase_id') }}', '{{ session('subscription_id') }}')" class="btn btn-secondary btn-block" style="margin-top: 10px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); width: 100%;">
+                    ⚡ Simular Pagamento (Dev)
+                </button>
+            @endif
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let checkRoute = '';
+            @if(session('purchase_id'))
+                checkRoute = "/purchase/{{ session('purchase_id') }}/status";
+            @elseif(session('subscription_id'))
+                checkRoute = "/subscription/{{ session('subscription_id') }}/status";
+            @endif
+
+            if (checkRoute) {
+                const interval = setInterval(async () => {
+                    try {
+                        const res = await fetch(checkRoute);
+                        const data = await res.json();
+                        if (data.status === 'confirmed' || data.status === 'active') {
+                            clearInterval(interval);
+                            alert('🎉 Pagamento confirmado com sucesso!');
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        console.error("Error checking payment status:", e);
+                    }
+                }, 3000);
+            }
+        });
+
+        async function simulatePixPayment(purchaseId, subscriptionId) {
+            const externalRef = purchaseId ? `purchase_${purchaseId}` : `subscription_${subscriptionId}`;
+            try {
+                const response = await fetch('/webhooks/asaas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        event: 'PAYMENT_RECEIVED',
+                        payment: {
+                            externalReference: externalRef,
+                            id: 'mock_payment_' + Math.random().toString(36).substr(2, 9),
+                            billingType: 'PIX'
+                        }
+                    })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    if (window.showToast) {
+                        window.showToast('Pagamento Pix simulado com sucesso!', 'success');
+                    } else {
+                        alert('Pagamento Pix simulado com sucesso!');
+                    }
+                } else {
+                    alert('Erro ao simular pagamento: ' + JSON.stringify(data));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro na requisição de simulação.');
+            }
+        }
+    </script>
+    @endif
+
+    <script>
+        function openCheckoutModal(type, id, title, price) {
+            const modal = document.getElementById('global-checkout-modal');
+            const form = document.getElementById('checkout-form');
+            const titleEl = document.getElementById('checkout-title');
+            const priceEl = document.getElementById('checkout-price-display');
+
+            titleEl.textContent = title;
+            priceEl.textContent = price;
+            
+            if (type === 'pack') {
+                form.action = `/pack/${id}/purchase`;
+            } else {
+                form.action = `/creator/${id}/subscribe`;
+            }
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCheckoutModal() {
+            const modal = document.getElementById('global-checkout-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function togglePaymentMethod(method) {
+            const cardForm = document.getElementById('credit-card-form');
+            const options = document.querySelectorAll('.pay-method-option');
+            
+            options.forEach(opt => {
+                const input = opt.querySelector('input');
+                if (input.value === method) {
+                    opt.style.borderColor = 'var(--accent-primary)';
+                    opt.style.background = 'rgba(233,30,140,0.05)';
+                    opt.querySelector('span:last-child').style.color = '#fff';
+                } else {
+                    opt.style.borderColor = 'rgba(255,255,255,0.08)';
+                    opt.style.background = 'none';
+                    opt.querySelector('span:last-child').style.color = 'var(--text-secondary)';
+                }
+            });
+
+            if (method === 'credit_card') {
+                cardForm.style.display = 'block';
+            } else {
+                cardForm.style.display = 'none';
+            }
+        }
+
+        function copyPixCode() {
+            const input = document.getElementById('pix-emv-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            alert('Chave copia e cola copiada para a área de transferência!');
+        }
+
+        function closePixModal() {
+            const modal = document.getElementById('pix-payment-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mask Card Number
+            const cardNum = document.getElementById('card_number');
+            if (cardNum) {
+                cardNum.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+                    e.target.value = v.substring(0, 19);
+                });
+            }
+
+            // Mask Expiry
+            const cardExp = document.getElementById('card_expiry');
+            if (cardExp) {
+                cardExp.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 2) {
+                        v = v.substring(0, 2) + '/' + v.substring(2, 4);
+                    }
+                    e.target.value = v.substring(0, 5);
+                });
+            }
+
+            // Mask CPF
+            const holderCpf = document.getElementById('holder_cpf');
+            if (holderCpf) {
+                holderCpf.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 9) {
+                        v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                    } else if (v.length > 6) {
+                        v = v.replace(/(\d{3})(\d{3})(\d{3})/, "$1.$2.$3");
+                    } else if (v.length > 3) {
+                        v = v.replace(/(\d{3})(\d{3})/, "$1.$2");
+                    }
+                    e.target.value = v.substring(0, 14);
+                });
+            }
+
+            // Mask Phone
+            const holderPhone = document.getElementById('holder_phone');
+            if (holderPhone) {
+                holderPhone.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 10) {
+                        v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+                    } else if (v.length > 5) {
+                        v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+                    } else if (v.length > 2) {
+                        v = v.replace(/^(\d{2})(\d{0,5})$/, "($1) $2");
+                    } else if (v.length > 0) {
+                        v = "(" + v;
+                    }
+                    e.target.value = v.substring(0, 15);
+                });
+            }
+
+            // Mask Zip
+            const holderZip = document.getElementById('holder_zip');
+            if (holderZip) {
+                holderZip.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 5) {
+                        v = v.substring(0, 5) + '-' + v.substring(5, 8);
+                    }
+                    e.target.value = v.substring(0, 9);
+                });
+            }
+        });
+    </script>
+    @endauth
+
     @stack('scripts')
 </body>
 </html>

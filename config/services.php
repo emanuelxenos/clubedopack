@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'payments' => [
+        'gateway' => env('PAYMENT_GATEWAY', 'mock'),
+    ],
+
+    'asaas' => [
+        'key' => env('ASAAS_API_KEY'),
+        'url' => env('ASAAS_API_URL', 'https://sandbox.asaas.com/api/v3'),
+        'webhook_token' => env('ASAAS_WEBHOOK_TOKEN'),
+    ],
+
 ];

@@ -136,6 +136,7 @@ function showToast(message, type = 'info') {
     toast.querySelector('.toast-close').addEventListener('click', () => dismissToast(toast));
     setTimeout(() => dismissToast(toast), 5000);
 }
+window.showToast = showToast;
 
 // ═══════════════════ UPLOAD ZONES ═══════════════════
 function initUploadZones() {

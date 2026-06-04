@@ -8,6 +8,7 @@ use App\Http\Controllers\PackController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\WithdrawalController;
 
 // ── Public Routes ──
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -25,12 +26,17 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 // ── Authenticated Routes (Any Role) ──
 Route::middleware('auth')->group(function () {
     // Purchases & Subscriptions
-    Route::post('/pack/{pack}/purchase', [PurchaseController::class, 'purchasePack'])->name('pack.purchase');
-    Route::post('/creator/{creator}/subscribe', [PurchaseController::class, 'subscribe'])->name('creator.subscribe');
+    Route::post('/pack/{pack:slug}/purchase', [PurchaseController::class, 'purchasePack'])->name('pack.purchase');
+    Route::post('/creator/{creator:username}/subscribe', [PurchaseController::class, 'subscribe'])->name('creator.subscribe');
+    Route::get('/purchase/{purchase}/status', [PurchaseController::class, 'checkPurchaseStatus'])->name('purchase.status');
+    Route::get('/subscription/{subscription}/status', [PurchaseController::class, 'checkSubscriptionStatus'])->name('subscription.status');
 
     // My Library (Customer)
     Route::get('/my-library', [PurchaseController::class, 'library'])->name('library');
 });
+
+// ── Webhooks (Public) ──
+Route::post('/webhooks/asaas', [\App\Http\Controllers\WebhookController::class, 'handleAsaas']);
 
 // ── Creator Dashboard Routes ──
 Route::middleware(['auth', 'role:creator'])->prefix('dashboard')->group(function () {
@@ -44,6 +50,7 @@ Route::middleware(['auth', 'role:creator'])->prefix('dashboard')->group(function
     Route::post('/packs/{pack}/media', [DashboardController::class, 'uploadMedia'])->name('dashboard.packs.media.upload');
     Route::delete('/media/{media}', [DashboardController::class, 'deleteMedia'])->name('dashboard.media.destroy');
     Route::get('/earnings', [DashboardController::class, 'earnings'])->name('dashboard.earnings');
+    Route::post('/withdraw', [WithdrawalController::class, 'store'])->name('dashboard.withdraw');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('dashboard.profile');
     Route::put('/profile', [DashboardController::class, 'updateProfile'])->name('dashboard.profile.update');
     
@@ -58,6 +65,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUser'])->name('admin.users.toggle');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('admin.transactions');
+    Route::get('/withdrawals', [WithdrawalController::class, 'adminIndex'])->name('admin.withdrawals');
+    Route::post('/withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'adminApprove'])->name('admin.withdrawals.approve');
+    Route::post('/withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'adminReject'])->name('admin.withdrawals.reject');
     Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('admin.categories.destroy');

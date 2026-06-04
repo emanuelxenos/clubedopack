@@ -17,6 +17,11 @@ class Subscription extends Model
         'amount',
         'starts_at',
         'expires_at',
+        'gateway_id',
+        'payment_method',
+        'pix_qr_code',
+        'pix_qr_code_base64',
+        'payment_status',
     ];
 
     protected $casts = [

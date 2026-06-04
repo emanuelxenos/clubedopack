@@ -15,6 +15,11 @@ class Purchase extends Model
         'amount_paid',
         'gateway_transaction_id',
         'status',
+        'gateway_id',
+        'payment_method',
+        'pix_qr_code',
+        'pix_qr_code_base64',
+        'payment_status',
     ];
 
     protected $casts = [

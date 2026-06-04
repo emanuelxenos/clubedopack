@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
     // ── Helpers ──
 
     public function isAdmin(): bool
