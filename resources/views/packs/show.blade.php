@@ -299,6 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const playerWrapper = document.createElement('div');
         playerWrapper.className = 'custom-player';
 
+        const ratioWrapper = document.createElement('div');
+        ratioWrapper.className = 'video-ratio-wrapper';
+
         const video = document.createElement('video');
         video.src = url;
         video.autoplay = true;
@@ -311,7 +314,8 @@ document.addEventListener('DOMContentLoaded', () => {
             video.classList.add('loaded');
         };
 
-        playerWrapper.appendChild(video);
+        ratioWrapper.appendChild(video);
+        playerWrapper.appendChild(ratioWrapper);
 
         // Center Play overlay
         const centerPlay = document.createElement('div');
@@ -392,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (watermarkTemplate) {
             const wmClone = watermarkTemplate.cloneNode(true);
             wmClone.style.bottom = '80px';
-            playerWrapper.appendChild(wmClone);
+            ratioWrapper.appendChild(wmClone);
         }
 
         // Helpers

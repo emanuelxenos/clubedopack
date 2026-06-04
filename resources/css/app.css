@@ -2137,12 +2137,27 @@ main:has(.dashboard-layout) + .footer {
     box-shadow: var(--shadow-xl);
 }
 
-.custom-player video {
+.video-ratio-wrapper {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     max-width: 100%;
     max-height: 90vh;
+}
+
+.custom-player video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     display: block;
-    object-fit: contain;
     cursor: pointer;
+}
+
+.custom-player:fullscreen .video-ratio-wrapper,
+.custom-player:-webkit-full-screen .video-ratio-wrapper {
+    max-height: 100vh;
 }
 
 .custom-player-controls {
