@@ -74,6 +74,21 @@ class WithdrawalController extends Controller
             return back()->with('error', 'Este saque já foi processado.');
         }
 
+        // If the gateway is Asaas, trigger the transfer automatically via API
+        if (config('services.payments.gateway') === 'asaas' && config('app.env') !== 'testing') {
+            $asaas = new \App\Services\Payments\AsaasGateway();
+            $transferResponse = $asaas->transfer(
+                $withdrawal->amount,
+                $withdrawal->pix_key_type,
+                $withdrawal->pix_key,
+                "Saque Clube do Pack #{$withdrawal->id}"
+            );
+
+            if (!$transferResponse['success']) {
+                return back()->with('error', 'Falha ao processar transferência via Asaas: ' . ($transferResponse['error'] ?? 'Erro desconhecido.'));
+            }
+        }
+
         DB::transaction(function () use ($withdrawal) {
             $withdrawal->update(['status' => 'completed']);
 
@@ -91,7 +106,7 @@ class WithdrawalController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Saque marcado como concluído com sucesso!');
+        return back()->with('success', 'Saque processado e transferido via PIX com sucesso!');
     }
 
     public function adminReject(Request $request, Withdrawal $withdrawal)

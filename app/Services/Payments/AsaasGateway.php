@@ -222,4 +222,41 @@ class AsaasGateway implements PaymentGatewayInterface
             return 'failed';
         }
     }
+
+    public function transfer(float $amount, string $pixKeyType, string $pixKey, string $description = ''): array
+    {
+        // Map app types to Asaas API types: CPF, CNPJ, EMAIL, PHONE, RANDOM_KEY (EVP)
+        $typeMap = [
+            'cpf' => 'CPF',
+            'cnpj' => 'CNPJ',
+            'email' => 'EMAIL',
+            'phone' => 'PHONE',
+            'random' => 'EVP',
+            'evp' => 'EVP',
+        ];
+        
+        $mappedType = $typeMap[strtolower($pixKeyType)] ?? 'EVP';
+
+        $payload = [
+            'value' => $amount,
+            'pixAddressKey' => $pixKey,
+            'pixAddressKeyType' => $mappedType,
+            'description' => $description ?: 'Saque Clube do Pack',
+        ];
+
+        try {
+            $response = $this->request('post', 'transfers', $payload);
+            return [
+                'success' => true,
+                'transfer_id' => $response['id'] ?? null,
+                'status' => $response['status'] ?? 'pending',
+            ];
+        } catch (\Exception $e) {
+            Log::error("Asaas transfer API failure: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }
