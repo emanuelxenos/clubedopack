@@ -8,6 +8,7 @@ use App\Models\Purchase;
 use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\Category;
+use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
