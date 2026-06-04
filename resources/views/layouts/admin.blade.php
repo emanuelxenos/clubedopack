@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="page-content" style="padding-top: 72px;">
+<div class="page-content" style="padding-top: 72px; padding-bottom: 0;">
     <div class="dashboard-layout">
         {{-- ── Admin Sidebar ── --}}
         <aside class="dashboard-sidebar">
@@ -42,3 +42,6 @@
     </div>
 </div>
 @endsection
+
+@section('hide-footer', true)
+

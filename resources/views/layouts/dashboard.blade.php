@@ -50,3 +50,6 @@
     </div>
 </div>
 @endsection
+
+@section('hide-footer', true)
+
