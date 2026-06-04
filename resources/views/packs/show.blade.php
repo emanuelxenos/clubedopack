@@ -287,6 +287,302 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentIndex = 0;
 
+    const ICONS = {
+        play: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,
+        pause: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
+        volumeUp: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`,
+        volumeMute: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`,
+        fullscreen: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`
+    };
+
+    function createCustomVideoPlayer(url) {
+        const playerWrapper = document.createElement('div');
+        playerWrapper.className = 'custom-player';
+
+        const video = document.createElement('video');
+        video.src = url;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute('controlsList', 'nodownload');
+        video.oncontextmenu = (e) => e.preventDefault();
+
+        video.onloadeddata = () => {
+            loader.style.display = 'none';
+            video.classList.add('loaded');
+        };
+
+        playerWrapper.appendChild(video);
+
+        // Center Play overlay
+        const centerPlay = document.createElement('div');
+        centerPlay.className = 'player-center-play';
+        centerPlay.innerHTML = `<span class="play-icon">▶</span>`;
+        playerWrapper.appendChild(centerPlay);
+
+        // Controls bar
+        const controls = document.createElement('div');
+        controls.className = 'custom-player-controls';
+
+        // Play/Pause button
+        const playPauseBtn = document.createElement('button');
+        playPauseBtn.className = 'player-ctrl-btn';
+        playPauseBtn.type = 'button';
+        playPauseBtn.innerHTML = ICONS.pause; // Since autoplay is true
+        controls.appendChild(playPauseBtn);
+
+        // Timeline
+        const timelineContainer = document.createElement('div');
+        timelineContainer.className = 'player-timeline-container';
+
+        const timeline = document.createElement('div');
+        timeline.className = 'player-timeline';
+
+        const bufferBar = document.createElement('div');
+        bufferBar.className = 'player-buffer';
+
+        const progressBar = document.createElement('div');
+        progressBar.className = 'player-progress';
+
+        const handle = document.createElement('div');
+        handle.className = 'player-timeline-handle';
+
+        timeline.appendChild(bufferBar);
+        timeline.appendChild(progressBar);
+        timeline.appendChild(handle);
+        timelineContainer.appendChild(timeline);
+        controls.appendChild(timelineContainer);
+
+        // Time Display
+        const timeDisplay = document.createElement('div');
+        timeDisplay.className = 'player-time';
+        timeDisplay.textContent = '00:00 / 00:00';
+        controls.appendChild(timeDisplay);
+
+        // Volume Group
+        const volumeGroup = document.createElement('div');
+        volumeGroup.className = 'player-volume-group';
+
+        const volumeBtn = document.createElement('button');
+        volumeBtn.className = 'player-ctrl-btn';
+        volumeBtn.type = 'button';
+        volumeBtn.innerHTML = ICONS.volumeUp;
+
+        const volumeSlider = document.createElement('input');
+        volumeSlider.type = 'range';
+        volumeSlider.className = 'player-volume-slider';
+        volumeSlider.min = '0';
+        volumeSlider.max = '1';
+        volumeSlider.step = '0.05';
+        volumeSlider.value = '1';
+
+        volumeGroup.appendChild(volumeBtn);
+        volumeGroup.appendChild(volumeSlider);
+        controls.appendChild(volumeGroup);
+
+        // Fullscreen
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'player-ctrl-btn';
+        fullscreenBtn.type = 'button';
+        fullscreenBtn.innerHTML = ICONS.fullscreen;
+        controls.appendChild(fullscreenBtn);
+
+        playerWrapper.appendChild(controls);
+
+        // Watermark template clone
+        if (watermarkTemplate) {
+            const wmClone = watermarkTemplate.cloneNode(true);
+            wmClone.style.bottom = '80px';
+            playerWrapper.appendChild(wmClone);
+        }
+
+        // Helpers
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds === Infinity) return '00:00';
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            const pad = (val) => String(val).padStart(2, '0');
+            if (hrs > 0) {
+                return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+            }
+            return `${pad(mins)}:${pad(secs)}`;
+        }
+
+        function updateProgress() {
+            const duration = video.duration || 0;
+            const currentTime = video.currentTime || 0;
+            const percent = duration > 0 ? (currentTime / duration) * 100 : 0;
+            progressBar.style.width = percent + '%';
+            handle.style.left = percent + '%';
+            
+            if (video.buffered.length > 0 && duration > 0) {
+                let activeBufferIndex = 0;
+                for (let i = 0; i < video.buffered.length; i++) {
+                    if (video.buffered.start(i) <= currentTime && video.buffered.end(i) >= currentTime) {
+                        activeBufferIndex = i;
+                        break;
+                    }
+                }
+                const bufferedEnd = video.buffered.end(activeBufferIndex);
+                const bufferPercent = (bufferedEnd / duration) * 100;
+                bufferBar.style.width = bufferPercent + '%';
+            } else {
+                bufferBar.style.width = '0%';
+            }
+            
+            timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        }
+
+        // Event listeners
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('progress', updateProgress);
+        video.addEventListener('loadedmetadata', updateProgress);
+
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        video.addEventListener('click', togglePlay);
+        playPauseBtn.addEventListener('click', togglePlay);
+
+        video.addEventListener('play', () => {
+            playerWrapper.classList.add('playing');
+            playPauseBtn.innerHTML = ICONS.pause;
+            resetHideTimer();
+        });
+
+        video.addEventListener('pause', () => {
+            playerWrapper.classList.remove('playing');
+            playPauseBtn.innerHTML = ICONS.play;
+            playerWrapper.classList.remove('hide-controls');
+            clearTimeout(hideTimeout);
+        });
+
+        // Seek timeline dragging
+        function seek(e) {
+            const rect = timeline.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clickX = clientX - rect.left;
+            const width = rect.width;
+            const duration = video.duration;
+            if (duration > 0 && width > 0) {
+                let percent = clickX / width;
+                if (percent < 0) percent = 0;
+                if (percent > 1) percent = 1;
+                video.currentTime = percent * duration;
+                updateProgress();
+            }
+        }
+
+        let isDragging = false;
+        
+        const onMouseMove = (e) => {
+            if (isDragging) seek(e);
+        };
+
+        const onMouseUp = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        timelineContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            seek(e);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault();
+        });
+
+        // Touch support
+        const onTouchMove = (e) => {
+            if (isDragging) seek(e);
+        };
+
+        const onTouchEnd = () => {
+            isDragging = false;
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        };
+
+        timelineContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            seek(e);
+            document.addEventListener('touchmove', onTouchMove, { passive: true });
+            document.addEventListener('touchend', onTouchEnd, { passive: true });
+            e.preventDefault();
+        });
+
+        // Volume handlers
+        function updateVolumeUI() {
+            if (video.muted || video.volume === 0) {
+                volumeBtn.innerHTML = ICONS.volumeMute;
+                volumeSlider.value = 0;
+            } else {
+                volumeBtn.innerHTML = ICONS.volumeUp;
+                volumeSlider.value = video.volume;
+            }
+        }
+
+        volumeBtn.addEventListener('click', () => {
+            video.muted = !video.muted;
+            updateVolumeUI();
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            video.volume = e.target.value;
+            video.muted = (video.volume === 0);
+            updateVolumeUI();
+        });
+
+        video.addEventListener('volumechange', updateVolumeUI);
+
+        // Fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (playerWrapper.requestFullscreen) {
+                    playerWrapper.requestFullscreen();
+                } else if (playerWrapper.webkitRequestFullscreen) {
+                    playerWrapper.webkitRequestFullscreen();
+                } else if (playerWrapper.msRequestFullscreen) {
+                    playerWrapper.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Auto-hide controls
+        let hideTimeout;
+        function resetHideTimer() {
+            playerWrapper.classList.remove('hide-controls');
+            clearTimeout(hideTimeout);
+            if (!video.paused) {
+                hideTimeout = setTimeout(() => {
+                    playerWrapper.classList.add('hide-controls');
+                }, 2500);
+            }
+        }
+
+        playerWrapper.addEventListener('mousemove', resetHideTimer);
+        playerWrapper.addEventListener('click', resetHideTimer);
+        playerWrapper.addEventListener('touchstart', resetHideTimer);
+
+        return playerWrapper;
+    }
+
     function openLightbox(index) {
         currentIndex = index;
         lightbox.style.display = 'flex';
@@ -294,13 +590,24 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMedia();
     }
 
+    function stopActiveVideos() {
+        const activeVideos = content.querySelectorAll('video');
+        activeVideos.forEach(v => {
+            v.pause();
+            v.src = '';
+            v.load();
+        });
+    }
+
     function closeLightbox() {
+        stopActiveVideos();
         lightbox.style.display = 'none';
         document.body.style.overflow = '';
         content.innerHTML = '';
     }
 
     function renderMedia() {
+        stopActiveVideos();
         content.innerHTML = '';
         loader.style.display = 'block';
         currentSpan.innerText = currentIndex + 1;
@@ -317,38 +624,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 loader.style.display = 'none';
                 img.alt = 'Erro ao carregar imagem';
                 img.style.opacity = 1;
-                // Adiciona uma borda vermelha e um texto para indicar que falhou
                 img.style.border = '2px solid red';
                 img.style.padding = '20px';
                 img.style.backgroundColor = 'rgba(255,0,0,0.1)';
             };
             content.appendChild(img);
         } else {
-            const container = document.createElement('div');
-            container.style.position = 'relative';
-            container.style.display = 'inline-block';
-            container.style.maxWidth = '100%';
-            container.style.maxHeight = '90vh';
-            
-            const video = document.createElement('video');
-            video.src = media.url;
-            video.controls = true;
-            video.autoplay = true;
-            video.setAttribute('controlsList', 'nodownload');
-            video.oncontextmenu = (e) => e.preventDefault();
-            
-            video.onloadeddata = () => {
-                loader.style.display = 'none';
-                video.classList.add('loaded');
-            };
-            
-            container.appendChild(video);
-            
-            // Injeta a marca d'água dentro do container do vídeo (grudado nele!)
-            const wmClone = watermarkTemplate.cloneNode(true);
-            container.appendChild(wmClone);
-            
-            content.appendChild(container);
+            const player = createCustomVideoPlayer(media.url);
+            content.appendChild(player);
         }
     }
 
