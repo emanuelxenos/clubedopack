@@ -117,7 +117,12 @@
                     <a href="{{ route('dashboard.earnings') }}">💰 Ganhos</a>
                 @endif
                 @if(auth()->user()->isAdmin())
-                    <a href="{{ route('admin') }}">🛡️ Admin</a>
+                    <a href="{{ route('admin') }}">🛡️ Admin Dashboard</a>
+                    <a href="{{ route('admin.users') }}">👥 Admin: Usuários</a>
+                    <a href="{{ route('admin.transactions') }}">💳 Admin: Transações</a>
+                    <a href="{{ route('admin.withdrawals') }}">💸 Admin: Saques</a>
+                    <a href="{{ route('admin.categories') }}">🏷️ Admin: Categorias</a>
+                    <a href="{{ route('admin.settings') }}">⚙️ Admin: Configurações</a>
                 @endif
                 <a href="{{ route('library') }}">📚 Biblioteca</a>
                 <div class="divider" style="height:1px;background:var(--border-primary);margin:var(--space-sm) 0;"></div>
