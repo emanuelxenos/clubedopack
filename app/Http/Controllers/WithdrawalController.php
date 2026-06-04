@@ -44,16 +44,19 @@ class WithdrawalController extends Controller
                 $lockedUser->decrement('balance_available', $amount);
 
                 // Create withdrawal record
-                Withdrawal::create([
+                $withdrawal = Withdrawal::create([
                     'user_id' => $lockedUser->id,
                     'amount' => $amount,
                     'pix_key_type' => $lockedUser->pix_key_type,
                     'pix_key' => $lockedUser->pix_key,
                     'status' => 'pending',
                 ]);
+
+                // Dispatch the automatic queue job to send PIX instantly
+                \App\Jobs\ProcessWithdrawalJob::dispatch($withdrawal);
             });
 
-            return back()->with('success', 'Solicitação de saque enviada com sucesso! O valor foi retido e será transferido em breve.');
+            return back()->with('success', 'Solicitação de saque recebida! O PIX está sendo transferido para sua conta agora mesmo.');
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {

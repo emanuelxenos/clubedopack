@@ -202,6 +202,8 @@ class CheckoutAndWithdrawalTest extends TestCase
 
     public function test_creator_withdrawal_flow_with_admin_approval(): void
     {
+        \Illuminate\Support\Facades\Queue::fake();
+
         // 1. Give creator some available balance
         $this->creator->update(['balance_available' => 100.00]);
 
@@ -264,6 +266,8 @@ class CheckoutAndWithdrawalTest extends TestCase
 
     public function test_creator_withdrawal_rejection(): void
     {
+        \Illuminate\Support\Facades\Queue::fake();
+
         // 1. Give creator balance and PIX key
         $this->creator->update([
             'balance_available' => 100.00,
