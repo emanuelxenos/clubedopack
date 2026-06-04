@@ -32,10 +32,16 @@
             <h3 style="margin-bottom:var(--space-lg);">🔌 Gateway de Pagamento</h3>
             <div class="form-group">
                 <label class="form-label">Gateway Ativo</label>
-                <div class="form-input" style="cursor:default;background:var(--bg-tertiary);">
-                    Mock (Desenvolvimento)
+                <div class="form-input" style="cursor:default;background:var(--bg-tertiary);text-transform: capitalize;">
+                    {{ config('services.payments.gateway') === 'asaas' ? 'Asaas (Integração Ativa)' : 'Mock (Desenvolvimento)' }}
                 </div>
-                <div class="form-hint">O sistema está preparado para integração com Mercado Pago, Asaas ou PagSeguro. Configure as credenciais no .env quando estiver pronto para produção.</div>
+                <div class="form-hint">
+                    @if(config('services.payments.gateway') === 'asaas')
+                        Rodando em ambiente: <strong>{{ str_contains(config('services.asaas.url'), 'sandbox') ? 'Sandbox (Testes)' : 'Produção (Real)' }}</strong>.
+                    @else
+                        O sistema está preparado para integração com Asaas. Configure as credenciais no .env para ativar.
+                    @endif
+                </div>
             </div>
         </div>
 
