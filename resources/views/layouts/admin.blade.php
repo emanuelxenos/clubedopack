@@ -21,8 +21,11 @@
                     <a href="{{ route('admin.transactions') }}" class="{{ request()->routeIs('admin.transactions') ? 'active' : '' }}">
                         💳 Transações
                     </a>
+                    <a href="{{ route('admin.earnings') }}" class="{{ request()->routeIs('admin.earnings') ? 'active' : '' }}">
+                        💰 Meus Ganhos
+                    </a>
                     <a href="{{ route('admin.withdrawals') }}" class="{{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}">
-                        💸 Saques
+                        💸 Saques Criadores
                     </a>
                     <a href="{{ route('admin.categories') }}" class="{{ request()->routeIs('admin.categories') ? 'active' : '' }}">
                         🏷️ Categorias

@@ -72,6 +72,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('admin.categories.destroy');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::get('/earnings', [AdminController::class, 'earnings'])->name('admin.earnings');
 });
 
 // ── Pack Detail (must be before profile to avoid conflicts) ──

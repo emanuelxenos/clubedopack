@@ -68,6 +68,7 @@
 
                             @if(auth()->user()->isAdmin())
                                 <a href="{{ route('admin') }}">🛡️ Painel Admin</a>
+                                <a href="{{ route('admin.earnings') }}">💰 Meus Ganhos</a>
                                 <a href="{{ route('admin.users') }}">👥 Usuários</a>
                                 <a href="{{ route('admin.transactions') }}">💳 Transações</a>
                             @endif
@@ -120,7 +121,8 @@
                     <a href="{{ route('admin') }}">🛡️ Admin Dashboard</a>
                     <a href="{{ route('admin.users') }}">👥 Admin: Usuários</a>
                     <a href="{{ route('admin.transactions') }}">💳 Admin: Transações</a>
-                    <a href="{{ route('admin.withdrawals') }}">💸 Admin: Saques</a>
+                    <a href="{{ route('admin.earnings') }}">💰 Admin: Meus Ganhos</a>
+                    <a href="{{ route('admin.withdrawals') }}">💸 Admin: Saques Criadores</a>
                     <a href="{{ route('admin.categories') }}">🏷️ Admin: Categorias</a>
                     <a href="{{ route('admin.settings') }}">⚙️ Admin: Configurações</a>
                 @endif

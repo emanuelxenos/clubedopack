@@ -152,4 +152,17 @@ class AdminController extends Controller
     {
         return view('admin.settings');
     }
+
+    public function earnings()
+    {
+        // Calculate platform net earnings
+        $platformEarnings = Transaction::where('status', 'completed')->sum('platform_fee');
+
+        // Calculate actual withdrawals processed/debited from platform fee balance
+        $withdrawals = Withdrawal::where('user_id', auth()->id())->latest()->get();
+        $totalWithdrawn = Withdrawal::where('user_id', auth()->id())->where('status', 'completed')->sum('amount');
+        $availableBalance = $platformEarnings - $totalWithdrawn;
+
+        return view('admin.earnings', compact('platformEarnings', 'totalWithdrawn', 'availableBalance', 'withdrawals'));
+    }
 }
