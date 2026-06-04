@@ -14,6 +14,20 @@ class AdminController extends Controller
 {
     public function index()
     {
+        $gatewayBalance = 0.00;
+        $gateway = config('services.payments.gateway', 'mock');
+        if ($gateway === 'asaas' && config('app.env') !== 'testing') {
+            try {
+                $asaas = new \App\Services\Payments\AsaasGateway();
+                $gatewayBalance = $asaas->getWalletBalance();
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("Could not fetch Asaas wallet balance: " . $e->getMessage());
+            }
+        } else {
+            // Mock value for simulation/development environment representation
+            $gatewayBalance = Transaction::where('status', 'completed')->sum('amount') - Withdrawal::where('status', 'completed')->sum('amount');
+        }
+
         $stats = [
             'total_users' => User::count(),
             'total_creators' => User::where('role', 'creator')->count(),
@@ -23,6 +37,7 @@ class AdminController extends Controller
             'total_subscriptions' => Subscription::where('status', 'active')->count(),
             'total_revenue' => Transaction::where('status', 'completed')->sum('amount'),
             'platform_fees' => Transaction::where('status', 'completed')->sum('platform_fee'),
+            'gateway_balance' => $gatewayBalance,
         ];
 
         $recentTransactions = Transaction::with('user')->latest()->limit(10)->get();

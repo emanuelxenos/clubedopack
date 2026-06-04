@@ -31,6 +31,11 @@
             <div class="stat-value">R$ {{ number_format($stats['total_revenue'], 2, ',', '.') }}</div>
             <div class="stat-label">Receita Total</div>
         </div>
+        <div class="stat-card" style="border-color: var(--accent-primary); background: linear-gradient(135deg, rgba(233, 30, 140, 0.05), transparent);">
+            <div class="stat-icon" style="color: var(--accent-primary); background: var(--accent-soft);">💳</div>
+            <div class="stat-value" style="color: var(--accent-primary);">R$ {{ number_format($stats['gateway_balance'], 2, ',', '.') }}</div>
+            <div class="stat-label">Saldo Disponível no Gateway</div>
+        </div>
         <div class="stat-card">
             <div class="stat-icon">🏦</div>
             <div class="stat-value">R$ {{ number_format($stats['platform_fees'], 2, ',', '.') }}</div>

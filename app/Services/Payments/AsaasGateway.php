@@ -259,4 +259,15 @@ class AsaasGateway implements PaymentGatewayInterface
             ];
         }
     }
+
+    public function getWalletBalance(): float
+    {
+        try {
+            $response = $this->request('get', 'finance/balance');
+            return (float) ($response['balance'] ?? 0.00);
+        } catch (\Exception $e) {
+            Log::error("Failed to fetch wallet balance from Asaas: " . $e->getMessage());
+            return 0.00;
+        }
+    }
 }
