@@ -29,14 +29,42 @@
         <h3 style="margin-top: 0; margin-bottom: var(--space-md); font-size: 1.25rem; color: var(--text-primary);">💸 Solicitar Retirada de Lucro via PIX</h3>
         
         @if(empty(auth()->user()->pix_key) || empty(auth()->user()->pix_key_type))
-            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.2); padding: var(--space-lg); border-radius: var(--radius-md); display: flex; align-items: center; gap: 15px;">
-                <span style="font-size: 1.5rem;">⚠️</span>
-                <div>
-                    <h4 style="margin: 0; color: var(--danger); font-size: 0.95rem;">Chave PIX do Admin não configurada</h4>
-                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
-                        Você precisa configurar a chave PIX do administrador nas <a href="{{ route('admin.settings') }}" style="color: var(--accent-primary); text-decoration: underline; font-weight: 600;">Configurações do Painel</a> ou no seu Perfil para poder efetuar retiradas automatizadas.
-                    </p>
+            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.2); padding: var(--space-xl); border-radius: var(--radius-md); margin-bottom: var(--space-xl);">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: var(--space-lg);">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <div>
+                        <h4 style="margin: 0; color: var(--danger); font-size: 1rem; font-weight: 700;">Chave PIX do Admin não configurada</h4>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+                            Cadastre a sua chave PIX abaixo agora para habilitar as retiradas automáticas de lucro.
+                        </p>
+                    </div>
                 </div>
+                
+                <form action="{{ route('dashboard.profile.update') }}" method="POST" style="background: var(--bg-card); padding: var(--space-lg); border-radius: var(--radius-sm); border: 1px solid var(--border-primary);">
+                    @csrf
+                    @method('PUT')
+                    
+                    {{-- Hidden fields to preserve admin profile data --}}
+                    <input type="hidden" name="name" value="{{ auth()->user()->name }}">
+                    <input type="hidden" name="username" value="{{ auth()->user()->username }}">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: var(--space-md); align-items: flex-end;">
+                        <div>
+                            <label class="form-label">Tipo de Chave</label>
+                            <select name="pix_key_type" class="form-select" required>
+                                <option value="cpf">CPF</option>
+                                <option value="email">E-mail</option>
+                                <option value="phone">Celular</option>
+                                <option value="random">Chave Aleatória (EVP)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Chave PIX</label>
+                            <input type="text" name="pix_key" class="form-input" required placeholder="Insira sua chave...">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="height: 48px; width: 100%;">💾 Salvar PIX</button>
+                    </div>
+                </form>
             </div>
         @else
             <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-xl); align-items: start;">
