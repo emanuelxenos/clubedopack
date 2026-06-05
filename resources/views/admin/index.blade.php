@@ -21,10 +21,15 @@
             <div class="stat-value" style="color: var(--accent-primary);">R$ {{ number_format($stats['platform_fees'], 2, ',', '.') }}</div>
             <div class="stat-label">Minha Receita Líquida (Acumulada)</div>
         </div>
-        <div class="stat-card" style="border-color: var(--accent-primary); background: linear-gradient(135deg, rgba(233, 30, 140, 0.05), transparent);">
-            <div class="stat-icon" style="color: var(--accent-primary); background: var(--accent-soft);">📈</div>
-            <div class="stat-value" style="color: var(--accent-primary);">R$ {{ number_format($stats['monthly_earnings'], 2, ',', '.') }}</div>
-            <div class="stat-label">Minha Receita Líquida (Este Mês)</div>
+        <div class="stat-card" style="border-color: var(--accent-primary); background: linear-gradient(135deg, rgba(233, 30, 140, 0.05), transparent); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="stat-icon" style="color: var(--accent-primary); background: var(--accent-soft);">📈</div>
+                <div class="stat-value" style="color: var(--accent-primary);">R$ {{ number_format($stats['monthly_earnings'], 2, ',', '.') }}</div>
+                <div class="stat-label">Minha Receita Líquida (Este Mês)</div>
+            </div>
+            <a href="{{ route('admin.earnings') }}" class="btn btn-primary btn-sm" style="margin-top: var(--space-md); width: 100%; text-align: center; text-decoration: none;">
+                💸 Ir para Sacar Lucro
+            </a>
         </div>
         <div class="stat-card">
             <div class="stat-icon">💸</div>
