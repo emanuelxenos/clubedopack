@@ -135,4 +135,92 @@
             <p>Seus saques de lucros da plataforma serão listados aqui.</p>
         </div>
     @endif
+
+    {{-- ── Graphic Analysis ── --}}
+    <div class="card mt-2xl" style="padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); margin-top: var(--space-2xl);">
+        <h3 style="margin-bottom: var(--space-lg); color: var(--text-primary); display: flex; align-items: center; gap: 8px;">📊 Lucro Líquido vs Retiradas (Últimos 30 Dias)</h3>
+        <div style="position: relative; height: 320px; width: 100%;">
+            <canvas id="adminEarningsChart"></canvas>
+        </div>
+    </div>
+
+    @push('styles')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @endpush
+
+    @push('styles')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('adminEarningsChart').getContext('2d');
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+            const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! $chartData['labels'] !!},
+                    datasets: [
+                        {
+                            label: 'Meu Lucro Líquido (R$)',
+                            data: {!! $chartData['revenue'] !!},
+                            borderColor: '#e91e8c',
+                            backgroundColor: 'rgba(233, 30, 140, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                        },
+                        {
+                            label: 'Minhas Retiradas (R$)',
+                            data: {!! $chartData['withdrawals'] !!},
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: textColor,
+                                font: {
+                                    family: 'Inter, system-ui, sans-serif',
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) {
+                                    return 'R$ ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    @endpush
 @endsection

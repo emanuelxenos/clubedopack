@@ -15,58 +15,11 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // Platform Net Earnings = sum of all platform fees collected from completed transactions
-        $platformEarnings = Transaction::where('status', 'completed')->sum('platform_fee');
-        $totalPaidOut = Withdrawal::where('status', 'completed')->sum('amount');
-        $totalPendingWithdrawals = Withdrawal::where('status', 'pending')->sum('amount');
-
-        // Monthly stats (Current month starting from 1st day)
-        $monthStart = now()->startOfMonth();
-        $monthlyEarnings = Transaction::where('status', 'completed')
-            ->where('created_at', '>=', $monthStart)
-            ->sum('platform_fee');
-        $monthlyWithdrawals = Withdrawal::where('status', 'completed')
-            ->where('created_at', '>=', $monthStart)
-            ->sum('amount');
-
-        // Chart Data (Last 30 Days)
-        $chartLabels = [];
-        $chartRevenue = [];
-        $chartWithdrawals = [];
-
-        for ($i = 29; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $chartLabels[] = $date->format('d/m');
-
-            // Platform fees earned on this specific day
-            $dayFee = Transaction::where('status', 'completed')
-                ->whereDate('created_at', $date->toDateString())
-                ->sum('platform_fee');
-            $chartRevenue[] = (float) $dayFee;
-
-            // Withdrawals completed on this specific day
-            $dayPayout = Withdrawal::where('status', 'completed')
-                ->whereDate('created_at', $date->toDateString())
-                ->sum('amount');
-            $chartWithdrawals[] = (float) $dayPayout;
-        }
-
         $stats = [
             'total_users' => User::count(),
             'total_creators' => User::where('role', 'creator')->count(),
             'total_customers' => User::where('role', 'customer')->count(),
             'total_packs' => Pack::count(),
-            'total_purchases' => Purchase::where('status', 'confirmed')->count(),
-            'total_subscriptions' => Subscription::where('status', 'active')->count(),
-            'total_revenue' => Transaction::where('status', 'completed')->sum('amount'),
-            'platform_fees' => $platformEarnings,
-            'total_paid_out' => $totalPaidOut,
-            'total_pending_withdrawals' => $totalPendingWithdrawals,
-            'monthly_earnings' => $monthlyEarnings,
-            'monthly_withdrawals' => $monthlyWithdrawals,
-            'chart_labels' => json_encode($chartLabels),
-            'chart_revenue' => json_encode($chartRevenue),
-            'chart_withdrawals' => json_encode($chartWithdrawals),
         ];
 
         $recentTransactions = Transaction::with('user')->latest()->limit(10)->get();
@@ -163,6 +116,35 @@ class AdminController extends Controller
         $totalWithdrawn = Withdrawal::where('user_id', auth()->id())->where('status', 'completed')->sum('amount');
         $availableBalance = $platformEarnings - $totalWithdrawn;
 
-        return view('admin.earnings', compact('platformEarnings', 'totalWithdrawn', 'availableBalance', 'withdrawals'));
+        // Chart Data (Last 30 Days)
+        $chartLabels = [];
+        $chartRevenue = [];
+        $chartWithdrawals = [];
+
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $chartLabels[] = $date->format('d/m');
+
+            // Platform fees earned on this specific day
+            $dayFee = Transaction::where('status', 'completed')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('platform_fee');
+            $chartRevenue[] = (float) $dayFee;
+
+            // Admin Withdrawals completed on this specific day
+            $dayPayout = Withdrawal::where('user_id', auth()->id())
+                ->where('status', 'completed')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('amount');
+            $chartWithdrawals[] = (float) $dayPayout;
+        }
+
+        $chartData = [
+            'labels' => json_encode($chartLabels),
+            'revenue' => json_encode($chartRevenue),
+            'withdrawals' => json_encode($chartWithdrawals),
+        ];
+
+        return view('admin.earnings', compact('platformEarnings', 'totalWithdrawn', 'availableBalance', 'withdrawals', 'chartData'));
     }
 }
