@@ -73,6 +73,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('admin.categories.destroy');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::get('/earnings', [AdminController::class, 'earnings'])->name('admin.earnings');
+    Route::post('/withdraw', [WithdrawalController::class, 'storeAdmin'])->name('admin.withdraw');
+    Route::put('/profile/pix', [AdminController::class, 'updatePix'])->name('admin.profile.pix.update');
 });
 
 // ── Pack Detail (must be before profile to avoid conflicts) ──

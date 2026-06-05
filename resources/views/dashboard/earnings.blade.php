@@ -53,22 +53,30 @@
             <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-xl); align-items: start;">
                 <div>
                     <p style="margin-top: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-                        * O saque mínimo é de <strong>R$ 5,00</strong>.<br>
+                        * O saque mínimo é de <strong>R$ {{ number_format(config('app.min_withdrawal_amount', 50.00), 2, ',', '.') }}</strong>.<br>
                         * O valor do saque será enviado para a sua chave cadastrada:<br>
                         <strong>{{ strtoupper(auth()->user()->pix_key_type) }}:</strong> <code style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; font-family: monospace;">{{ auth()->user()->pix_key }}</code>.
                     </p>
                 </div>
                 
-                <form action="{{ route('dashboard.withdraw') }}" method="POST" style="display: flex; gap: var(--space-md); align-items: flex-end;">
-                    @csrf
-                    <div style="flex: 1;">
-                        <label class="form-label" style="display: block; margin-bottom: 6px; font-size: 0.85rem;">Valor para Saque (R$)</label>
-                        <input type="number" name="amount" class="form-input" min="5" max="{{ auth()->user()->balance_available }}" step="0.01" required placeholder="0,00" style="font-size: 1.1rem; font-weight: bold; color: #fff;">
+                @if(auth()->user()->balance_available < config('app.min_withdrawal_amount', 50.00))
+                    <div style="background: rgba(231, 76, 60, 0.08); border: 1px solid rgba(231, 76, 60, 0.15); padding: var(--space-lg); border-radius: var(--radius-md); width: 100%;">
+                        <p style="margin: 0; font-size: 0.9rem; color: #ff6b6b; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <span>⚠️</span> Saldo insuficiente para saque. Você precisa de pelo menos R$ {{ number_format(config('app.min_withdrawal_amount', 50.00), 2, ',', '.') }} de saldo disponível (seu saldo atual: R$ {{ number_format(auth()->user()->balance_available, 2, ',', '.') }}).
+                        </p>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg" style="height: 48px; white-space: nowrap;">
-                        Solicitar Resgate
-                    </button>
-                </form>
+                @else
+                    <form action="{{ route('dashboard.withdraw') }}" method="POST" style="display: flex; gap: var(--space-md); align-items: flex-end; width: 100%;">
+                        @csrf
+                        <div style="flex: 1;">
+                            <label class="form-label" style="display: block; margin-bottom: 6px; font-size: 0.85rem;">Valor para Saque (R$)</label>
+                            <input type="number" name="amount" class="form-input" min="{{ config('app.min_withdrawal_amount', 50.00) }}" max="{{ auth()->user()->balance_available }}" step="0.01" required placeholder="0,00" style="font-size: 1.1rem; font-weight: bold; color: #fff;">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg" style="height: 48px; white-space: nowrap;">
+                            Solicitar Resgate
+                        </button>
+                    </form>
+                @endif
             </div>
         @endif
     </div>

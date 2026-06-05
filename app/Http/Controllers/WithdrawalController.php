@@ -23,8 +23,10 @@ class WithdrawalController extends Controller
             return back()->with('error', 'Por favor, configure sua chave PIX no seu perfil antes de solicitar um saque.');
         }
 
+        $minAmount = config('app.min_withdrawal_amount', 50.00);
+
         $request->validate([
-            'amount' => 'required|numeric|min:5.00', // Mínimo de R$ 5,00 para saque
+            'amount' => 'required|numeric|min:' . $minAmount,
         ]);
 
         $amount = $request->amount;
@@ -61,6 +63,62 @@ class WithdrawalController extends Controller
             throw $e;
         } catch (\Exception $e) {
             return back()->with('error', 'Falha ao processar solicitação de saque: ' . $e->getMessage());
+        }
+    }
+
+    public function storeAdmin(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->isAdmin()) {
+            abort(403);
+        }
+
+        if (empty($user->pix_key) || empty($user->pix_key_type)) {
+            return back()->with('error', 'Por favor, configure sua chave PIX no seu perfil antes de solicitar a retirada.');
+        }
+
+        $minAmount = config('app.min_withdrawal_amount', 50.00);
+
+        $request->validate([
+            'amount' => 'required|numeric|min:' . $minAmount,
+        ]);
+
+        $amount = $request->amount;
+
+        try {
+            DB::transaction(function () use ($user, $amount) {
+                // Calculate available admin balance (platform earnings - total withdrawn/pending)
+                $platformEarnings = Transaction::where('status', 'completed')->sum('platform_fee');
+                $totalWithdrawn = Withdrawal::where('user_id', $user->id)
+                    ->whereIn('status', ['pending', 'completed'])
+                    ->sum('amount');
+                $availableBalance = $platformEarnings - $totalWithdrawn;
+
+                if ($availableBalance < $amount) {
+                    throw ValidationException::withMessages([
+                        'amount' => ['Saldo disponível insuficiente para realizar esta retirada.'],
+                    ]);
+                }
+
+                // Create withdrawal record
+                $withdrawal = Withdrawal::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'pix_key_type' => $user->pix_key_type,
+                    'pix_key' => $user->pix_key,
+                    'status' => 'pending',
+                ]);
+
+                // Dispatch the automatic queue job to send PIX instantly
+                \App\Jobs\ProcessWithdrawalJob::dispatch($withdrawal);
+            });
+
+            return back()->with('success', 'Solicitação de retirada recebida! O PIX está sendo transferido para sua conta agora mesmo.');
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            return back()->with('error', 'Falha ao processar solicitação de retirada: ' . $e->getMessage());
         }
     }
 

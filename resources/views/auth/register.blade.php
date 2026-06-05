@@ -89,6 +89,13 @@
                            placeholder="Repita a senha" required>
                 </div>
 
+                <div class="form-group" style="display: flex; align-items: flex-start; gap: var(--space-xs); margin-top: var(--space-lg); margin-bottom: var(--space-lg);">
+                    <input type="checkbox" id="terms" name="terms" value="1" required style="width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: var(--accent-primary);">
+                    <label for="terms" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; line-height: 1.4; user-select: none;">
+                        Li e concordo com os <a href="{{ route('pages.terms') }}" target="_blank" style="color: var(--accent-primary); text-decoration: underline; font-weight: 600;">Termos de Uso</a> e a <a href="{{ route('pages.privacy') }}" target="_blank" style="color: var(--accent-primary); text-decoration: underline; font-weight: 600;">Política de Privacidade</a>.
+                    </label>
+                </div>
+
                 <button type="submit" class="btn btn-primary btn-block btn-lg">Criar Conta</button>
             </form>
 

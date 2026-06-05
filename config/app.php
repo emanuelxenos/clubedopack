@@ -130,6 +130,7 @@ return [
     */
 
     'platform_fee_percent' => (int) env('PLATFORM_FEE_PERCENT', 15),
+    'min_withdrawal_amount' => (float) env('MIN_WITHDRAWAL_AMOUNT', 50.00),
     'storage_mode' => env('STORAGE_MODE', 'local'),
 
 ];

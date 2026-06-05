@@ -53,6 +53,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:creator,customer',
+            'terms' => 'required|accepted',
             'birth_date' => [
                 'required',
                 'date',
@@ -66,6 +67,7 @@ class AuthController extends Controller
         ], [
             'birth_date.required' => 'A data de nascimento é obrigatória.',
             'birth_date.date' => 'Insira uma data de nascimento válida.',
+            'terms.accepted' => 'Você deve aceitar os Termos de Uso e Política de Privacidade para se cadastrar.',
         ]);
 
         // Generate unique username from name

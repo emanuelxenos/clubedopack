@@ -26,7 +26,7 @@
                     <ul style="list-style: none; padding: 0; margin-bottom: var(--space-xl); display: flex; flex-direction: column; gap: var(--space-md);">
                         <li style="display: flex; gap: var(--space-sm); align-items: flex-start;">
                             <span style="color: var(--accent-primary); font-weight: bold;">✓</span>
-                            <span><strong>Taxa de apenas 15%:</strong> Fique com 85% de tudo o que vender.</span>
+                            <span><strong>Taxa de apenas {{ config('app.platform_fee_percent', 15) }}%:</strong> Fique com {{ 100 - config('app.platform_fee_percent', 15) }}% de tudo o que vender.</span>
                         </li>
                         <li style="display: flex; gap: var(--space-sm); align-items: flex-start;">
                             <span style="color: var(--accent-primary); font-weight: bold;">✓</span>

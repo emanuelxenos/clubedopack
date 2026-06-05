@@ -106,7 +106,9 @@ class ProcessWithdrawalJob implements ShouldQueue
 
             // Safely refund the creator using lockForUpdate
             $creator = User::where('id', $lockedWithdrawal->user_id)->lockForUpdate()->first();
-            $creator->increment('balance_available', $lockedWithdrawal->amount);
+            if ($creator->isCreator()) {
+                $creator->increment('balance_available', $lockedWithdrawal->amount);
+            }
         });
     }
 }

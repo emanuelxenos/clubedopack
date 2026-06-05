@@ -147,4 +147,21 @@ class AdminController extends Controller
 
         return view('admin.earnings', compact('platformEarnings', 'totalWithdrawn', 'availableBalance', 'withdrawals', 'chartData'));
     }
+
+    public function updatePix(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'pix_key_type' => 'required|string|in:cpf,email,phone,random',
+            'pix_key' => 'required|string|max:255',
+        ]);
+
+        $user->update([
+            'pix_key_type' => $validated['pix_key_type'],
+            'pix_key' => $validated['pix_key'],
+        ]);
+
+        return back()->with('success', 'Chave PIX do administrador salva com sucesso!');
+    }
 }

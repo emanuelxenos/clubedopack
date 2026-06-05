@@ -43,14 +43,14 @@
                 <div>
                     <h2 style="font-size: 1.5rem; margin-bottom: var(--space-xs); font-family: var(--font-heading);">Taxa de Serviço</h2>
                     <div style="font-size: 3rem; font-weight: 800; color: var(--accent-primary); margin: var(--space-md) 0; font-family: var(--font-heading);">
-                        15%
+                        {{ config('app.platform_fee_percent', 15) }}%
                     </div>
                     <p class="text-secondary" style="margin-bottom: var(--space-lg); font-size: 0.95rem;">
-                        Mantemos apenas uma pequena taxa de 15% sobre cada venda ou assinatura concluída para cobrir custos operacionais e de infraestrutura.
+                        Mantemos apenas uma comissão de {{ config('app.platform_fee_percent', 15) }}% sobre cada venda ou assinatura concluída para cobrir custos operacionais e de infraestrutura.
                     </p>
                     <div style="border-top: 1px solid var(--border-primary); padding-top: var(--space-md); margin-top: var(--space-md); text-align: left;">
                         <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-sm); font-size: 0.9rem;">
-                            <li>✓ <strong>85% de repasse:</strong> Fique com o maior split do mercado</li>
+                            <li>✓ <strong>{{ 100 - config('app.platform_fee_percent', 15) }}% de repasse:</strong> Fique com a maior parte do seu faturamento</li>
                             <li>✓ Proteção contra fraudes e estornos</li>
                             <li>✓ Armazenamento de mídia premium ilimitado</li>
                             <li>✓ Suporte VIP dedicado ao criador</li>
@@ -68,7 +68,7 @@
                 <div>
                     <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Como eu recebo meus ganhos?</h4>
                     <p class="text-secondary" style="font-size: 0.9rem;">
-                        Graças ao nosso sistema de <strong>Split de Pagamento Instantâneo</strong>, os seus ganhos (85% do valor da venda) são transferidos de forma direta para a sua conta Pix no exato momento da compra!
+                        Graças ao nosso sistema de <strong>Split de Pagamento Instantâneo</strong>, os seus ganhos ({{ 100 - config('app.platform_fee_percent', 15) }}% do valor da venda) são transferidos de forma direta para a sua conta Pix no exato momento da compra!
                     </p>
                 </div>
                 <div>
@@ -80,7 +80,7 @@
                 <div>
                     <h4 style="font-size: 1rem; margin-bottom: var(--space-xs); color: var(--text-primary);">Há custos extras de transferência?</h4>
                     <p class="text-secondary" style="font-size: 0.9rem;">
-                        Não! A única taxa é a comissão padrão de 15% retida automaticamente no split. O repasse Pix para a sua conta é 100% gratuito e instantâneo.
+                        Não! A única taxa é a comissão padrão de {{ config('app.platform_fee_percent', 15) }}% retida automaticamente no split. O repasse Pix para a sua conta é 100% gratuito e instantâneo.
                     </p>
                 </div>
             </div>

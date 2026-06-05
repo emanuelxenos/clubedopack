@@ -33,5 +33,7 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="PAYMENT_GATEWAY" value="mock"/>
+        <env name="PLATFORM_FEE_PERCENT" value="15"/>
+        <env name="MIN_WITHDRAWAL_AMOUNT" value="5.00"/>
     </php>
 </phpunit>
